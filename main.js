@@ -1,4 +1,4 @@
-/*// Init
+// Init
 var canvas = document.getElementById('canvas');
 canvas.width = screen.width;
 canvas.height = screen.height;
@@ -66,4 +66,4 @@ function Main()
 }
 
 Main();
-*/
+
