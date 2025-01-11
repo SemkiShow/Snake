@@ -1,0 +1,11 @@
+commit.sh
+backup.sh
+main.exe
+build*/*
+out
+.cache
+.idea
+.vs
+.vscode
+*.zip
+main*
