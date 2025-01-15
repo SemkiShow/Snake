@@ -134,7 +134,7 @@ int main()
             // Check collision with the walls
             if (snake.body[snake.body.size()-1]+horizontalCellsNumber < horizontalCellsNumber && snake.direction == 'U')
                 snake.body[snake.body.size()-1] += horizontalCellsNumber * windowHeight / cellSize;
-            if (snake.body[snake.body.size()-1] > (horizontalCellsNumber-1) * windowHeight / cellSize && snake.direction == 'D')
+            if (snake.body[snake.body.size()-1] >= horizontalCellsNumber * windowHeight / cellSize && snake.direction == 'D')
                 snake.body[snake.body.size()-1] -= horizontalCellsNumber * windowHeight / cellSize;
             if ((snake.body[snake.body.size()-1]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
                 snake.body[snake.body.size()-1] += horizontalCellsNumber;
