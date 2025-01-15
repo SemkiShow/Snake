@@ -125,7 +125,7 @@ int main()
                 {
                     if (snake.body[j] == apples[i].position)
                     {
-                        apples[0].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+                        apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
                         snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                     }
                 }
