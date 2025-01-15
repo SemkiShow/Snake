@@ -10,7 +10,7 @@ unsigned int windowSize[2] = {windowWidth, windowHeight};
 unsigned int horizontalCellsNumber = windowWidth / cellSize;
 bool verticalSync = true;
 
-char* board;
+// char* board;
 
 class Snake
 {
@@ -20,6 +20,7 @@ class Snake
         char direction = 'R';
         sf::Color color = sf::Color(100, 250, 50);
         std::vector<char> keyBuffer;
+        double speed = 1;
 };
 
 int main()
@@ -29,6 +30,9 @@ int main()
     snake.body.push_back(0);
     snake.body.push_back(1);
     snake.body.push_back(2);
+    snake.body.push_back(3);
+    snake.body.push_back(4);
+    snake.body.push_back(5);
 
     // SFML init
     sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
@@ -58,31 +62,30 @@ int main()
         }
         window.clear();
 
+        // Detect player input
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && lastKeyPress != 'U' && lastKeyPress != 'D')
         {
             lastKeyPress = 'U';
             snake.keyBuffer.push_back('U');
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && lastKeyPress != 'D' && lastKeyPress != 'U')
         {
             lastKeyPress = 'D';
             snake.keyBuffer.push_back('D');
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && lastKeyPress != 'L' && lastKeyPress != 'R')
         {
             lastKeyPress = 'L';
             snake.keyBuffer.push_back('L');
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && lastKeyPress != 'R' && lastKeyPress != 'L')
         {
             lastKeyPress = 'R';
             snake.keyBuffer.push_back('R');
         }
 
-        if (delayClock.getElapsedTime().asSeconds() >= 0.05)
+        // Snake physics stuff
+        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * snake.body.size()))
         {
             delayClock.restart();
 
@@ -103,20 +106,35 @@ int main()
             snake.body.push_back(snake.body[snake.body.size() - 1] + snakeDirectionInteger);
             // Remove the last tail piece
             snake.body.erase(snake.body.begin());
+
+            // Check collision with the walls
+            if (snake.body[snake.body.size()-1] < horizontalCellsNumber && snake.direction == 'U')
+                snake.body[snake.body.size()-1] += horizontalCellsNumber * windowHeight / cellSize;
+            if (snake.body[snake.body.size()-1] >= (horizontalCellsNumber-1) * windowHeight / cellSize && snake.direction == 'D')
+                snake.body[snake.body.size()-1] -= horizontalCellsNumber * windowHeight / cellSize;
+            if ((snake.body[snake.body.size()-1]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
+                snake.body[snake.body.size()-1] += horizontalCellsNumber;
+            if (snake.body[snake.body.size()-1] % horizontalCellsNumber == 0 && snake.direction == 'R')
+                snake.body[snake.body.size()-1] -= horizontalCellsNumber;
         }
 
+        // Drawing the snake
         for (int i = 0; i < snake.body.size(); i++)
         {
+            if (snake.body[i] < 0)
+                snake.body[i] += horizontalCellsNumber * windowHeight / cellSize;
+            if (snake.body[i] > horizontalCellsNumber * windowHeight / cellSize)
+                snake.body[i] -= horizontalCellsNumber * windowHeight / cellSize;
+
             sf::RectangleShape bodyPiece({cellSize * 1.f, cellSize * 1.f});
             bodyPiece.setFillColor(snake.color);
-            if (snake.body[i] > horizontalCellsNumber * windowHeight / cellSize)
-                snake.body[i] = snake.body[i] % horizontalCellsNumber;
             bodyPiece.setPosition({(snake.body[i] % horizontalCellsNumber) * cellSize * 1.f, 
                 (snake.body[i] / horizontalCellsNumber) * cellSize * 1.f});
             window.draw(bodyPiece);
         }
 
-        std::cout << snake.body[snake.body.size()] << std::endl;
+        // Print debug info
+        // std::cout <<  << std::endl;
 
         window.display();
     }
