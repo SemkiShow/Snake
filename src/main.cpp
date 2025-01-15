@@ -39,8 +39,6 @@ int main()
     snake.body.push_back(0);
     snake.body.push_back(1);
     snake.body.push_back(2);
-    snake.body.push_back(3);
-    snake.body.push_back(4);
     srand(time(0));
 
     // SFML init
@@ -188,6 +186,12 @@ int main()
             gameOver.setString("Game Over!");
             window.draw(gameOver);
         }
+
+        // Print score text
+        sf::Text score(font);
+        score.setCharacterSize(50);
+        score.setString("Score: " + std::to_string(snake.body.size()));
+        window.draw(score);
 
         // Print debug info
         // std::cout << snake.body.size() << std::endl;
