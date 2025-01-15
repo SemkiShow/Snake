@@ -10,7 +10,7 @@ unsigned int windowSize[2] = {windowWidth, windowHeight};
 unsigned int horizontalCellsNumber = windowWidth / cellSize;
 bool verticalSync = true;
 
-// char* board;
+bool isGameOver = false;
 
 class Snake
 {
@@ -20,7 +20,7 @@ class Snake
         char direction = 'R';
         sf::Color color = sf::Color(100, 250, 50);
         std::vector<char> keyBuffer;
-        double speed = 1;
+        double speed = 10;
 };
 
 int main()
@@ -32,10 +32,10 @@ int main()
     snake.body.push_back(2);
     snake.body.push_back(3);
     snake.body.push_back(4);
-    snake.body.push_back(5);
 
     // SFML init
     sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
+    sf::Font font("./JetBrainsMonoNerdFont-Medium.ttf");
     if (verticalSync)
     {
         window.setFramerateLimit(144);
@@ -85,7 +85,7 @@ int main()
         }
 
         // Snake physics stuff
-        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * snake.body.size()))
+        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * snake.body.size()) && !isGameOver)
         {
             delayClock.restart();
 
@@ -102,30 +102,39 @@ int main()
             if (snake.direction == 'D') snakeDirectionInteger = horizontalCellsNumber;
             if (snake.direction == 'L') snakeDirectionInteger = -1;
             if (snake.direction == 'R') snakeDirectionInteger = 1;
-            // Move the head
-            snake.body.push_back(snake.body[snake.body.size() - 1] + snakeDirectionInteger);
             // Remove the last tail piece
             snake.body.erase(snake.body.begin());
+            // Move the head
+            snake.body.push_back(snake.body[snake.body.size() - 1] + snakeDirectionInteger);
 
             // Check collision with the walls
-            if (snake.body[snake.body.size()-1] < horizontalCellsNumber && snake.direction == 'U')
+            if (snake.body[snake.body.size()-1]+horizontalCellsNumber < horizontalCellsNumber && snake.direction == 'U')
                 snake.body[snake.body.size()-1] += horizontalCellsNumber * windowHeight / cellSize;
-            if (snake.body[snake.body.size()-1] >= (horizontalCellsNumber-1) * windowHeight / cellSize && snake.direction == 'D')
+            if (snake.body[snake.body.size()-1]-horizontalCellsNumber >= (horizontalCellsNumber-1) * windowHeight / cellSize && snake.direction == 'D')
                 snake.body[snake.body.size()-1] -= horizontalCellsNumber * windowHeight / cellSize;
             if ((snake.body[snake.body.size()-1]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
                 snake.body[snake.body.size()-1] += horizontalCellsNumber;
             if (snake.body[snake.body.size()-1] % horizontalCellsNumber == 0 && snake.direction == 'R')
                 snake.body[snake.body.size()-1] -= horizontalCellsNumber;
+
+            // Check self-collision
+            for (int i = 0; i < snake.body.size(); i++)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if (snake.body[i] == snake.body[j] && i != j)
+                    {
+                        isGameOver = true;
+                    }
+                    if (isGameOver) break;
+                }
+                if (isGameOver) break;
+            }
         }
 
         // Drawing the snake
         for (int i = 0; i < snake.body.size(); i++)
         {
-            if (snake.body[i] < 0)
-                snake.body[i] += horizontalCellsNumber * windowHeight / cellSize;
-            if (snake.body[i] > horizontalCellsNumber * windowHeight / cellSize)
-                snake.body[i] -= horizontalCellsNumber * windowHeight / cellSize;
-
             sf::RectangleShape bodyPiece({cellSize * 1.f, cellSize * 1.f});
             bodyPiece.setFillColor(snake.color);
             bodyPiece.setPosition({(snake.body[i] % horizontalCellsNumber) * cellSize * 1.f, 
@@ -133,8 +142,19 @@ int main()
             window.draw(bodyPiece);
         }
 
+        // Print game over is necessary
+        if (isGameOver)
+        {
+            sf::Text gameOver(font);
+            gameOver.setCharacterSize(250);
+            gameOver.setPosition({windowWidth * .05f, windowHeight * .3f});
+            gameOver.setFillColor(sf::Color(255, 0, 0));
+            gameOver.setString("Game Over!");
+            window.draw(gameOver);
+        }
+
         // Print debug info
-        // std::cout <<  << std::endl;
+        // std::cout << snake.body.size() << std::endl;
 
         window.display();
     }
