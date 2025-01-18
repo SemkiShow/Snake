@@ -13,9 +13,9 @@ cp build/bin/main main
 
 # Zipping the build
 rm release.zip
-# zip release.zip main main.exe JetBrainsMonoNerdFont-Medium.ttf LICENSE README.md
+# zip release.zip main main.exe assets/ LICENSE README.md
 # rm main main.exe
-zip release.zip main JetBrainsMonoNerdFont-Medium.ttf LICENSE README.md
+zip release.zip main assets/ LICENSE README.md
 rm main
 
 # Creating a GitHub release

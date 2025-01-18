@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -43,7 +44,11 @@ int main()
 
     // SFML init
     sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
-    sf::Font font("./JetBrainsMonoNerdFont-Medium.ttf");
+    sf::Music bgMusic("assets/snake-bg.mp3");
+    bgMusic.setLooping(true);
+    bgMusic.setVolume(50.f);
+    bgMusic.play();
+    sf::Font font("assets/JetBrainsMonoNerdFont-Medium.ttf");
     std::vector<Apple> apples;
     apples.push_back(Apple());
     apples[0].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
@@ -125,8 +130,9 @@ int main()
                 {
                     if (snake.body[j] == apples[i].position)
                     {
+                        for (int i = 0; i < apples[i].nutritionValue; i++)
+                            snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
-                        snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                     }
                 }
             }
@@ -179,6 +185,7 @@ int main()
         // Print game over is necessary
         if (isGameOver)
         {
+            bgMusic.stop();
             sf::Text gameOver(font);
             gameOver.setCharacterSize(0.135f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
             gameOver.setPosition({windowWidth * .05f, windowHeight * .3f});
