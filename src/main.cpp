@@ -56,6 +56,7 @@ int main()
     std::vector<Apple> apples;
     apples.push_back(Apple());
     apples[0].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+    apples[0].nutritionValue = 1;
     if (verticalSync)
     {
         window.setFramerateLimit(144);
@@ -134,7 +135,7 @@ int main()
                 {
                     if (snake.body[j] == apples[i].position)
                     {
-                        for (int i = 0; i < apples[i].nutritionValue; i++)
+                        for (int k = 0; k < apples[i].nutritionValue; k++)
                             snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
                         pickupSound.play();
