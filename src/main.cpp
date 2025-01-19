@@ -48,6 +48,10 @@ int main()
     bgMusic.setLooping(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
+    sf::SoundBuffer pickupBuffer("assets/pickup.wav");
+    sf::Sound pickupSound(pickupBuffer);
+    sf::SoundBuffer gameOverBuffer("assets/game-over.wav");
+    sf::Sound gameOverSound(gameOverBuffer);
     sf::Font font("assets/JetBrainsMonoNerdFont-Medium.ttf");
     std::vector<Apple> apples;
     apples.push_back(Apple());
@@ -133,6 +137,7 @@ int main()
                         for (int i = 0; i < apples[i].nutritionValue; i++)
                             snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+                        pickupSound.play();
                     }
                 }
             }
@@ -154,6 +159,7 @@ int main()
                 {
                     if (snake.body[i] == snake.body[j] && i != j)
                     {
+                        gameOverSound.play();
                         isGameOver = true;
                     }
                     if (isGameOver) break;

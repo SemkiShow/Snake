@@ -25,6 +25,7 @@
     ```
 1. Run 
 ```
+chmod +x compile.sh
 ./compile.sh
 ```
 
