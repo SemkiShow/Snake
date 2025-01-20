@@ -13,7 +13,8 @@ cp build_win/bin/* .
 
 # Zipping the build
 rm release.zip
-zip release.zip main main.exe libgcc_s_seh-1.dll libstdc++-6.dll assets/* LICENSE README.md
+echo "3" > score.txt
+zip release.zip main main.exe libgcc_s_seh-1.dll libstdc++-6.dll assets/* LICENSE README.md score.txt
 rm main main.exe
 
 # Creating a GitHub release

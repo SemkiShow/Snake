@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 #include <ctime>
+#include <fstream>
 
 unsigned int horizontalCellsNumber = 32;
 unsigned int windowWidth = 16*50*2;
@@ -14,6 +15,7 @@ unsigned int cellSize = windowWidth / horizontalCellsNumber;
 bool verticalSync = true;
 
 bool isGameOver = false;
+bool isHighscore = false;
 
 class Snake
 {
@@ -161,6 +163,20 @@ int main()
                     if (snake.body[i] == snake.body[j] && i != j)
                     {
                         gameOverSound.play();
+                        std::fstream scoreListFile;
+                        scoreListFile.open("score.txt", std::ios::in);
+                        std::vector<int> scores;
+                        std::string buf;
+                        while (std::getline(scoreListFile, buf))
+                            scores.push_back(stoi(buf));
+                        scores.push_back(snake.body.size());
+                        std::sort(scores.begin(), scores.end());
+                        scoreListFile.close();
+                        scoreListFile.open("score.txt", std::ios::out);
+                        for (int k = 0; k < scores.size(); k++)
+                            scoreListFile << scores[k] << std::endl;
+                        scoreListFile.close();
+                        if (snake.body.size() >= scores[scores.size()-1]) isHighscore = true;
                         isGameOver = true;
                     }
                     if (isGameOver) break;
@@ -193,19 +209,44 @@ int main()
         if (isGameOver)
         {
             bgMusic.stop();
-            sf::Text gameOver(font);
-            gameOver.setCharacterSize(0.135f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
-            gameOver.setPosition({windowWidth * .05f, windowHeight * .3f});
-            gameOver.setFillColor(sf::Color(255, 0, 0));
-            gameOver.setString("Game Over!");
-            window.draw(gameOver);
+            sf::Text gameOverText(font);
+            gameOverText.setCharacterSize(0.135f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+            gameOverText.setPosition({windowWidth * .05f, windowHeight * .3f});
+            gameOverText.setFillColor(sf::Color(255, 0, 0));
+            gameOverText.setString("Game Over!");
+            window.draw(gameOverText);
+            // Print the highscore text is necessary
+            if (isHighscore)
+            {
+                sf::Text highscoreText(font);
+                highscoreText.setCharacterSize(0.05f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+                highscoreText.setPosition({windowWidth * .35f, windowHeight * .6f});
+                highscoreText.setFillColor(sf::Color(255, 255, 0));
+                highscoreText.setString("Highscore!");
+                window.draw(highscoreText);
+
+                std::fstream scoreListFile;
+                scoreListFile.open("score.txt", std::ios::in);
+                std::vector<int> scores;
+                std::string buf;
+                while (std::getline(scoreListFile, buf))
+                    scores.push_back(stoi(buf));
+                scoreListFile.close();
+
+                sf::Text lastBestScoreText(font);
+                lastBestScoreText.setCharacterSize(0.03f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+                lastBestScoreText.setPosition({windowWidth * .325f, windowHeight * .7f});
+                lastBestScoreText.setFillColor(sf::Color(255, 255, 0));
+                lastBestScoreText.setString("Last best score: " + std::to_string(scores[scores.size()-2]));
+                window.draw(lastBestScoreText);
+            }
         }
 
         // Print score text
-        sf::Text score(font);
-        score.setCharacterSize(50);
-        score.setString("Score: " + std::to_string(snake.body.size()));
-        window.draw(score);
+        sf::Text scoreText(font);
+        scoreText.setCharacterSize(50);
+        scoreText.setString("Score: " + std::to_string(snake.body.size()));
+        window.draw(scoreText);
 
         // Print debug info
         // std::cout << snake.body.size() << std::endl;
