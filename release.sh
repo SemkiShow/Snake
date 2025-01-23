@@ -14,7 +14,7 @@ cp build_win/bin/main.exe .
 # Zipping the build
 rm release.zip
 echo "3" > score.txt
-printf "fun-mode=true\nfun-mode-level=5" > settings.txt
+printf "fun-mode=false\nfun-mode-level=5" > settings.txt
 zip release.zip main main.exe libgcc_s_seh-1.dll libstdc++-6.dll assets/* LICENSE README.md score.txt settings.txt
 rm main main.exe
 
