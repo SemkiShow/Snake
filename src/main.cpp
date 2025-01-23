@@ -150,14 +150,6 @@ int main()
                             snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
                         pickupSound.play();
-                        if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
-                        {
-                            mode = "china";
-                            bgMusic.stop();
-                            bgMusic.openFromFile("assets/china-bg.ogg");
-                            bgMusic.setVolume(200.f);
-                            bgMusic.play();
-                        }
                     }
                 }
             }
@@ -202,6 +194,15 @@ int main()
                 }
                 if (isGameOver) break;
             }
+        }
+        
+        if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
+        {
+            mode = "china";
+            bgMusic.stop();
+            bgMusic.openFromFile("assets/china-bg.ogg");
+            bgMusic.setVolume(200.f);
+            bgMusic.play();
         }
 
         // Print the background if it's china mode
@@ -249,30 +250,30 @@ int main()
             gameOverText.setFillColor(sf::Color(255, 0, 0));
             gameOverText.setString("Game Over!");
             window.draw(gameOverText);
-            // Print the highscore text is necessary
-            if (isHighscore)
-            {
-                sf::Text highscoreText(font);
-                highscoreText.setCharacterSize(0.05f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
-                highscoreText.setPosition({windowWidth * .35f, windowHeight * .6f});
-                highscoreText.setFillColor(sf::Color(255, 255, 0));
-                highscoreText.setString("Highscore!");
-                window.draw(highscoreText);
+        }
+        // Print the highscore text is necessary
+        if (isHighscore && isGameOver)
+        {
+            sf::Text highscoreText(font);
+            highscoreText.setCharacterSize(0.05f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+            highscoreText.setPosition({windowWidth * .35f, windowHeight * .6f});
+            highscoreText.setFillColor(sf::Color(255, 255, 0));
+            highscoreText.setString("Highscore!");
+            window.draw(highscoreText);
 
-                std::fstream scoreListFile;
-                scoreListFile.open("score.txt", std::ios::in);
-                std::vector<int> scores;
-                while (std::getline(scoreListFile, buf))
-                    scores.push_back(stoi(buf));
-                scoreListFile.close();
+            std::fstream scoreListFile;
+            scoreListFile.open("score.txt", std::ios::in);
+            std::vector<int> scores;
+            while (std::getline(scoreListFile, buf))
+                scores.push_back(stoi(buf));
+            scoreListFile.close();
 
-                sf::Text lastBestScoreText(font);
-                lastBestScoreText.setCharacterSize(0.03f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
-                lastBestScoreText.setPosition({windowWidth * .325f, windowHeight * .7f});
-                lastBestScoreText.setFillColor(sf::Color(255, 255, 0));
-                lastBestScoreText.setString("Last best score: " + std::to_string(scores[scores.size()-2]));
-                window.draw(lastBestScoreText);
-            }
+            sf::Text lastBestScoreText(font);
+            lastBestScoreText.setCharacterSize(0.03f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+            lastBestScoreText.setPosition({windowWidth * .325f, windowHeight * .7f});
+            lastBestScoreText.setFillColor(sf::Color(255, 255, 0));
+            lastBestScoreText.setString("Last best score: " + std::to_string(scores[scores.size()-2]));
+            window.draw(lastBestScoreText);
         }
 
         // Print score text

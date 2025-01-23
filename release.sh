@@ -18,5 +18,10 @@ printf "fun-mode=false\nfun-mode-level=5" > settings.txt
 zip release.zip main main.exe libgcc_s_seh-1.dll libstdc++-6.dll assets/* LICENSE README.md score.txt settings.txt
 rm main main.exe
 
+# Making a new GitHub commit
+git add .
+git commit
+git push origin main
+
 # Creating a GitHub release
 gh release create
