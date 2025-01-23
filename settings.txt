@@ -1,0 +1,2 @@
+fun-mode=false
+fun-mode-level=5

@@ -16,6 +16,8 @@ bool verticalSync = true;
 
 bool isGameOver = false;
 bool isHighscore = false;
+std::string mode = "normal";
+std::string buf;
 
 class Snake
 {
@@ -43,6 +45,13 @@ int main()
     snake.body.push_back(1);
     snake.body.push_back(2);
     srand(time(0));
+
+    // Read settings
+    std::fstream settingsFile;
+    settingsFile.open("settings.txt", std::ios::in);
+    std::vector<std::string> settingsList;
+    while (std::getline(settingsFile, buf))
+        settingsList.push_back(buf);
 
     // SFML init
     sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
@@ -141,6 +150,14 @@ int main()
                             snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
                         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
                         pickupSound.play();
+                        if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
+                        {
+                            mode = "china";
+                            bgMusic.stop();
+                            bgMusic.openFromFile("assets/china-bg.ogg");
+                            bgMusic.setVolume(200.f);
+                            bgMusic.play();
+                        }
                     }
                 }
             }
@@ -166,7 +183,6 @@ int main()
                         std::fstream scoreListFile;
                         scoreListFile.open("score.txt", std::ios::in);
                         std::vector<int> scores;
-                        std::string buf;
                         while (std::getline(scoreListFile, buf))
                             scores.push_back(stoi(buf));
                         scores.push_back(snake.body.size());
@@ -174,7 +190,10 @@ int main()
                         scoreListFile.close();
                         scoreListFile.open("score.txt", std::ios::out);
                         for (int k = 0; k < scores.size(); k++)
-                            scoreListFile << scores[k] << std::endl;
+                        {
+                            scoreListFile << scores[k];
+                            if (k != scores.size()-1) scoreListFile << std::endl;
+                        }
                         scoreListFile.close();
                         if (snake.body.size() >= scores[scores.size()-1]) isHighscore = true;
                         isGameOver = true;
@@ -183,6 +202,20 @@ int main()
                 }
                 if (isGameOver) break;
             }
+        }
+
+        // Print the background if it's china mode
+        if (mode == "china")
+        {
+            sf::Texture backgroundTexture;
+            if (isGameOver)
+                backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
+            else
+                backgroundTexture.loadFromFile("assets/china-bg.jpg");
+            backgroundTexture.setSmooth(true);
+            sf::Sprite backgroundSprite(backgroundTexture);
+            backgroundSprite.setScale({0.84, 0.84});
+            window.draw(backgroundSprite);
         }
 
         // Drawing the snake
@@ -206,7 +239,8 @@ int main()
         }
 
         // Print game over is necessary
-        if (isGameOver)
+        if (isGameOver && mode == "china") bgMusic.stop();
+        if (isGameOver && mode == "normal")
         {
             bgMusic.stop();
             sf::Text gameOverText(font);
@@ -228,7 +262,6 @@ int main()
                 std::fstream scoreListFile;
                 scoreListFile.open("score.txt", std::ios::in);
                 std::vector<int> scores;
-                std::string buf;
                 while (std::getline(scoreListFile, buf))
                     scores.push_back(stoi(buf));
                 scoreListFile.close();
@@ -245,7 +278,8 @@ int main()
         // Print score text
         sf::Text scoreText(font);
         scoreText.setCharacterSize(50);
-        scoreText.setString("Score: " + std::to_string(snake.body.size()));
+        std::string scorePrefix = (mode == "normal") ? "Score: " : "Social  credit: ";
+        scoreText.setString(scorePrefix + std::to_string(snake.body.size()));
         window.draw(scoreText);
 
         // Print debug info
