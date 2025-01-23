@@ -24,4 +24,4 @@ git commit
 git push origin main
 
 # Creating a GitHub release
-gh release create
+gh release create $1 release.zip
