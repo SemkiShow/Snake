@@ -194,15 +194,16 @@ int main()
                 }
                 if (isGameOver) break;
             }
-        }
         
-        if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
-        {
-            mode = "china";
-            bgMusic.stop();
-            bgMusic.openFromFile("assets/china-bg.ogg");
-            bgMusic.setVolume(200.f);
-            bgMusic.play();
+            // China mode check
+            if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
+            {
+                mode = "china";
+                bgMusic.stop();
+                bgMusic.openFromFile("assets/china-bg.ogg");
+                bgMusic.setVolume(200.f);
+                bgMusic.play();
+            }
         }
 
         // Print the background if it's china mode
