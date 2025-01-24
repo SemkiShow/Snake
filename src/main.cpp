@@ -95,22 +95,22 @@ int main()
         window.clear();
 
         // Detect player input
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && lastKeyPress != 'U' && lastKeyPress != 'D')
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && lastKeyPress != 'U' && lastKeyPress != 'D' && snake.keyBuffer.size() < 4)
         {
             lastKeyPress = 'U';
             snake.keyBuffer.push_back('U');
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && lastKeyPress != 'D' && lastKeyPress != 'U')
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && lastKeyPress != 'D' && lastKeyPress != 'U' && snake.keyBuffer.size() < 4)
         {
             lastKeyPress = 'D';
             snake.keyBuffer.push_back('D');
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && lastKeyPress != 'L' && lastKeyPress != 'R')
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && lastKeyPress != 'L' && lastKeyPress != 'R' && snake.keyBuffer.size() < 4)
         {
             lastKeyPress = 'L';
             snake.keyBuffer.push_back('L');
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && lastKeyPress != 'R' && lastKeyPress != 'L')
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && lastKeyPress != 'R' && lastKeyPress != 'L' && snake.keyBuffer.size() < 4)
         {
             lastKeyPress = 'R';
             snake.keyBuffer.push_back('R');
