@@ -16,6 +16,7 @@ bool verticalSync = true;
 
 bool isGameOver = false;
 bool isHighscore = false;
+bool isPaused = false;
 std::string mode = "normal";
 std::string buf;
 
@@ -59,6 +60,9 @@ int main()
     bgMusic.setLooping(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
+    sf::Music pauseMusic("assets/pause-music.mp3");
+    pauseMusic.setLooping(true);
+    pauseMusic.setVolume(50.f);
     sf::SoundBuffer pickupBuffer("assets/pickup.wav");
     sf::Sound pickupSound(pickupBuffer);
     sf::SoundBuffer gameOverBuffer("assets/game-over.wav");
@@ -90,7 +94,24 @@ int main()
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
-                window.close();
+            window.close();
+            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scan::Escape)
+                {
+                    isPaused = !isPaused;
+                    if (isPaused)
+                    {
+                        bgMusic.pause();
+                        pauseMusic.play();
+                    }
+                    else
+                    {
+                        pauseMusic.pause();
+                        bgMusic.play();
+                    }
+                }
+            }
         }
         window.clear();
 
@@ -117,7 +138,7 @@ int main()
         }
 
         // Snake physics stuff
-        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * sqrt(snake.body.size())) && !isGameOver)
+        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * sqrt(snake.body.size())) && !isGameOver && !isPaused)
         {
             delayClock.restart();
 
