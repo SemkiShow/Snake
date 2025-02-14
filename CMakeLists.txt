@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(imgui-sfml-test LANGUAGES CXX)
+project(Snake LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -37,6 +37,7 @@ FetchContent_MakeAvailable(imgui)
 
 # ImGui-SFML
 set(IMGUI_DIR ${imgui_SOURCE_DIR})
+set(IMGUI_INCLUDE_DIR ${imgui_SOURCE_DIR})
 option(IMGUI_SFML_FIND_SFML "Use find_package to find SFML" OFF)
 option(IMGUI_SFML_IMGUI_DEMO "Build imgui_demo.cpp" OFF)
 
