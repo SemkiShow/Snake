@@ -1,20 +1,22 @@
 #!/bin/bash
 # Compiling for Linux
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
+cd build &&
+cmake .. -DCMAKE_BUILD_TYPE=Release &&
+make &&
+cd ..
 cp build/bin/main main
 
 # Compiling for Windows
-cd build_win
-cmake .. --toolchain ../mingw-w64-x86_64.cmake
-make
+cd build_win &&
+cmake .. -DCMAKE_BUILD_TYPE=Release --toolchain ../mingw-w64-x86_64.cmake &&
+make &&
 cd ..
 cp build_win/bin/main.exe .
 
 # Zipping the build
 rm release.zip
 echo "3" > score.txt
-printf "fun-mode=false\nfun-mode-level=5" > settings.txt
+printf "fun-mode=false\nfun-mode-level=5\nspeed=3\nmax-speed=20\nscale=50\nsnake-color=0.392157,0.980392,0.196078\napple-color=1,0,0\napples-number=1\n" > settings.txt
 zip release.zip main main.exe libgcc_s_seh-1.dll libstdc++-6.dll assets/* LICENSE README.md score.txt settings.txt
 rm main main.exe
 

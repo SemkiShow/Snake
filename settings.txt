@@ -1,2 +1,8 @@
 fun-mode=false
 fun-mode-level=5
+speed=3
+max-speed=20
+scale=50
+snake-color=0.392157,0.980392,0.196078
+apple-color=1,0,0
+apples-number=1

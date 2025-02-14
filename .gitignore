@@ -9,4 +9,4 @@ out
 .vscode
 *.zip
 release/
-score.txt
+imgui.ini

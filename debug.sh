@@ -1,5 +1,6 @@
 #!/bin/bash
-cd build
+cd build &&
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. &&
 make &&
-gdb ./build/main
+cd .. &&
+gdb ./build/bin/main

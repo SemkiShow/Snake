@@ -1,3 +1,6 @@
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -6,11 +9,13 @@
 #include <random>
 #include <ctime>
 #include <fstream>
+#include <algorithm>
 
 unsigned int horizontalCellsNumber = 32;
+int menuOffset = 20;
 unsigned int windowWidth = 16*50*2;
 unsigned int windowHeight = 9*50*2;
-unsigned int windowSize[2] = {windowWidth, windowHeight};
+unsigned int windowSize[2] = {windowWidth - menuOffset, windowHeight + menuOffset};
 unsigned int cellSize = windowWidth / horizontalCellsNumber;
 bool verticalSync = true;
 
@@ -20,6 +25,11 @@ bool isPaused = false;
 std::string mode = "normal";
 std::string buf;
 
+sf::Music bgMusic;
+char lastKeyPress = 'R';
+
+bool isSettings = false;
+
 class Snake
 {
     public:
@@ -28,8 +38,9 @@ class Snake
         sf::Color color = sf::Color(100, 250, 50);
         std::vector<char> keyBuffer;
         double speed = 2;
-};
-
+        double maxSpeed = 20;
+}snake;
+    
 class Apple
 {
     public:
@@ -37,26 +48,158 @@ class Apple
         sf::Color color = sf::Color(255, 0, 0);
         unsigned int nutritionValue = 1;
 };
+std::vector<Apple> apples;
+    
+class Settings
+{
+    public:
+        void Save(std::string fileName);
+        void Load(std::string fileName);
+        bool funMode = false;
+        int funModeLevel = 5;
+        float speed = 2;
+        float maxSpeed = 20;
+        int scale = 32;
+        float snakeColor[3];
+        float appleColor[3];
+        int applesNumber = 1;
+}settings;
+
+std::string* Split(std::string input, char delimiter = ' ')
+{
+    std::vector<std::string> output;
+    output.push_back("");
+    int index = 0;
+    for (int i = 0; i < input.size(); i++)
+    {
+        if (input[i] == delimiter)
+        {
+            index++;
+            output.push_back("");
+            continue;
+        }
+        output[index] += input[i];
+    }
+    std::string* outputArray = new std::string[output.size()];
+    std::copy(output.begin(), output.end(), outputArray);
+    return outputArray;
+}
+
+void Settings::Save(std::string fileName)
+{
+    // Read the file
+    std::fstream settingsFile;
+    settingsFile.open(fileName, std::ios::out);
+    settingsFile << "fun-mode=" << (funMode ? "true" : "false") << "\n";
+    settingsFile << "fun-mode-level=" << funModeLevel << "\n";
+    settingsFile << "speed=" << speed << '\n';
+    settingsFile << "max-speed=" << maxSpeed << '\n';
+    settingsFile << "scale=" << scale << '\n';
+    settingsFile << "snake-color=" << snakeColor[0] << ',' << snakeColor[1] << ',' << snakeColor[2] << '\n';
+    settingsFile << "apple-color=" << appleColor[0] << ',' << appleColor[1] << ',' << appleColor[2] << '\n';
+    settingsFile << "apples-number=" << applesNumber << '\n';
+    settingsFile.close();
+}
+
+void Settings::Load(std::string fileName)
+{
+    // Read the file
+    std::fstream settingsFile;
+    settingsFile.open(fileName, std::ios::in);
+    std::vector<std::string> settingsList;
+    while (std::getline(settingsFile, buf))
+        settingsList.push_back(buf);
+    settingsFile.close();
+
+    // Process the file
+    funMode = (settingsList[0] == "fun-mode=true") ? true : false;
+    funModeLevel = stoi(settingsList[1].substr(15));
+    speed = stof(settingsList[2].substr(6));
+    maxSpeed = stof(settingsList[3].substr(10));
+    scale = stoi(settingsList[4].substr(6));
+    std::string* colorBuffer = Split(settingsList[5].substr(12), ',');
+    for (int i = 0; i < 3; i++)
+        snakeColor[i] = stof(colorBuffer[i]);
+    colorBuffer = Split(settingsList[6].substr(12), ',');
+    for (int i = 0; i < 3; i++)
+        appleColor[i] = stof(colorBuffer[i]);
+    applesNumber = stoi(settingsList[7].substr(14));
+}
+
+void ShowSettings(bool* isOpen)
+{
+    if (!ImGui::Begin("Settings", isOpen))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::Checkbox("fun-mode", &settings.funMode);
+    ImGui::SliderInt("fun-mode-level", &settings.funModeLevel, 0, 100);
+    ImGui::SliderFloat("speed", &settings.speed, 0.1f, 100);
+    ImGui::SliderFloat("max-speed", &settings.maxSpeed, 1, 100);
+    ImGui::SliderInt("scale", &settings.scale, 5, 100);
+    ImGui::ColorEdit3("snake-color", settings.snakeColor);
+    ImGui::ColorEdit3("apple-color", settings.appleColor);
+    ImGui::SliderInt("apples-number", &settings.applesNumber, 1, 50);
+    ImGui::End();
+}
+
+void Restart()
+{
+    snake.body.clear();
+    snake.body.push_back(0);
+    snake.body.push_back(1);
+    snake.body.push_back(2);
+    // snake.body.push_back(3);
+    // snake.body.push_back(4);
+    // snake.body.push_back(5);
+    // snake.body.push_back(6);
+    snake.color = sf::Color(settings.snakeColor[0] * 255, settings.snakeColor[1] * 255, settings.snakeColor[2] * 255);
+    snake.direction = 'R';
+    lastKeyPress = 'R';
+    apples.clear();
+    for (int i = 0; i < settings.applesNumber; i++)
+    {
+        apples.push_back(Apple());
+        apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+        apples[i].nutritionValue = 1;
+        apples[i].color = sf::Color(settings.appleColor[0] * 255, settings.appleColor[1] * 255, settings.appleColor[2] * 255);
+    }
+    isGameOver = false;
+    bgMusic.play();
+}
+
+void ShowMenuBar()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Menu"))
+        {
+            if (isPaused) if (ImGui::MenuItem("Unpause")) isPaused = false;
+            if (!isPaused) if (ImGui::MenuItem("Pause")) isPaused = true;
+            if (ImGui::MenuItem("Restart")) Restart();
+            if (ImGui::MenuItem("Settings"))
+            {
+                isSettings = true;
+                ShowSettings(&isSettings);
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+    return;
+}
 
 int main()
 {
     // Non-SFML init
-    Snake snake;
-    snake.body.push_back(0);
-    snake.body.push_back(1);
-    snake.body.push_back(2);
+    Restart();
     srand(time(0));
-
-    // Read settings
-    std::fstream settingsFile;
-    settingsFile.open("settings.txt", std::ios::in);
-    std::vector<std::string> settingsList;
-    while (std::getline(settingsFile, buf))
-        settingsList.push_back(buf);
+    settings.Load("settings.txt");
 
     // SFML init
     sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
-    sf::Music bgMusic("assets/snake-bg.mp3");
+    (void) bgMusic.openFromFile("assets/snake-bg.mp3");
     bgMusic.setLooping(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
@@ -68,10 +211,7 @@ int main()
     sf::SoundBuffer gameOverBuffer("assets/game-over.wav");
     sf::Sound gameOverSound(gameOverBuffer);
     sf::Font font("assets/JetBrainsMonoNerdFont-Medium.ttf");
-    std::vector<Apple> apples;
-    apples.push_back(Apple());
-    apples[0].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
-    apples[0].nutritionValue = 1;
+    sf::Texture backgroundTexture;
     if (verticalSync)
     {
         window.setFramerateLimit(144);
@@ -82,19 +222,22 @@ int main()
         window.setFramerateLimit(0);
         window.setVerticalSyncEnabled(false);
     }
-
+    
+    // ImGUI init
+    (void) ImGui::SFML::Init(window);
+    
     sf::Clock deltaTimeClock;
-    double deltaTime;
+    sf::Time deltaTime;
     sf::Clock delayClock;
-    char lastKeyPress;
+    int previousScale = horizontalCellsNumber;
+    int previousApplesNumber = settings.applesNumber;
     while (window.isOpen())
     {
-        deltaTime = deltaTimeClock.restart().asSeconds();
-
-        while (const std::optional event = window.pollEvent())
+        while (const auto event = window.pollEvent())
         {
+            ImGui::SFML::ProcessEvent(window, *event);
             if (event->is<sf::Event::Closed>())
-            window.close();
+                window.close();
             if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
             {
                 if (keyPressed->scancode == sf::Keyboard::Scan::Escape)
@@ -113,6 +256,13 @@ int main()
                 }
             }
         }
+        deltaTime = deltaTimeClock.restart();
+        ImGui::SFML::Update(window, deltaTime);
+        
+        // Draw ImGUI GUI
+        ShowMenuBar();
+        if (isSettings) ShowSettings(&isSettings);
+        
         window.clear();
 
         // Detect player input
@@ -138,7 +288,7 @@ int main()
         }
 
         // Snake physics stuff
-        if (delayClock.getElapsedTime().asSeconds() >= 1 / (snake.speed * sqrt(snake.body.size())) && !isGameOver && !isPaused)
+        if (delayClock.getElapsedTime().asSeconds() >= std::max(1 / (snake.speed * sqrt(snake.body.size())), 1 / snake.maxSpeed) && !isGameOver && !isPaused)
         {
             delayClock.restart();
 
@@ -176,10 +326,10 @@ int main()
             }
 
             // Check collision with the walls
-            if (snake.body[snake.body.size()-1]+horizontalCellsNumber < horizontalCellsNumber && snake.direction == 'U')
-                snake.body[snake.body.size()-1] += horizontalCellsNumber * windowHeight / cellSize;
-            if (snake.body[snake.body.size()-1] >= horizontalCellsNumber * windowHeight / cellSize && snake.direction == 'D')
-                snake.body[snake.body.size()-1] -= horizontalCellsNumber * windowHeight / cellSize;
+            if (snake.body[snake.body.size()-1] < 0 && snake.direction == 'U')
+                snake.body[snake.body.size()-1] += horizontalCellsNumber * (windowHeight / cellSize) + horizontalCellsNumber;
+            if (snake.body[snake.body.size()-1]-horizontalCellsNumber >= horizontalCellsNumber * (windowHeight / cellSize) && snake.direction == 'D')
+                snake.body[snake.body.size()-1] -= horizontalCellsNumber * (windowHeight / cellSize) + horizontalCellsNumber;
             if ((snake.body[snake.body.size()-1]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
                 snake.body[snake.body.size()-1] += horizontalCellsNumber;
             if (snake.body[snake.body.size()-1] % horizontalCellsNumber == 0 && snake.direction == 'R')
@@ -217,27 +367,53 @@ int main()
             }
         
             // China mode check
-            if (snake.body.size() >= stoi(settingsList[1].substr(15)) && mode != "china" && settingsList[0] == "fun-mode=true")
+            if (snake.body.size() >= settings.funModeLevel && mode != "china" && settings.funMode == true)
             {
                 mode = "china";
                 bgMusic.stop();
-                bgMusic.openFromFile("assets/china-bg.ogg");
+                (void) bgMusic.openFromFile("assets/china-bg.ogg");
                 bgMusic.setVolume(200.f);
                 bgMusic.play();
+            }
+            if (!(snake.body.size() >= settings.funModeLevel && settings.funMode == true) && mode != "normal")
+            {
+                mode = "normal";
+                bgMusic.stop();
+                (void) bgMusic.openFromFile("assets/snake-bg.mp3");
+                bgMusic.setVolume(50.f);
+                bgMusic.play();
+            }
+
+            snake.speed = settings.speed * 1.0;
+            snake.maxSpeed = settings.maxSpeed * 1.0;
+            // horizontalCellsNumber = settings.scale;
+            // cellSize = windowWidth / horizontalCellsNumber;
+            cellSize = settings.scale;
+            horizontalCellsNumber = windowWidth / cellSize;
+            if (settings.scale != previousScale || settings.applesNumber != previousApplesNumber)
+            {
+                previousScale = settings.scale;
+                previousApplesNumber = settings.applesNumber;
+                Restart();
+            }
+            snake.color = sf::Color(settings.snakeColor[0] * 255, settings.snakeColor[1] * 255, settings.snakeColor[2] * 255);
+            for (int i = 0; i < apples.size(); i++)
+            {
+                apples[i].color = sf::Color(settings.appleColor[0] * 255, settings.appleColor[1] * 255, settings.appleColor[2] * 255);
             }
         }
 
         // Print the background if it's china mode
         if (mode == "china")
         {
-            sf::Texture backgroundTexture;
             if (isGameOver)
-                backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
+                (void) backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
             else
-                backgroundTexture.loadFromFile("assets/china-bg.jpg");
+                (void) backgroundTexture.loadFromFile("assets/china-bg.jpg");
             backgroundTexture.setSmooth(true);
             sf::Sprite backgroundSprite(backgroundTexture);
             backgroundSprite.setScale({0.84, 0.84});
+            backgroundSprite.setPosition({0, menuOffset * 1.f});
             window.draw(backgroundSprite);
         }
 
@@ -247,7 +423,7 @@ int main()
             sf::RectangleShape bodyPiece({cellSize * 1.f, cellSize * 1.f});
             bodyPiece.setFillColor(snake.color);
             bodyPiece.setPosition({(snake.body[i] % horizontalCellsNumber) * cellSize * 1.f, 
-                (snake.body[i] / horizontalCellsNumber) * cellSize * 1.f});
+                (snake.body[i] / horizontalCellsNumber) * cellSize * 1.f + menuOffset});
             window.draw(bodyPiece);
         }
 
@@ -257,7 +433,7 @@ int main()
             sf::RectangleShape apple({cellSize * 1.f, cellSize * 1.f});
             apple.setFillColor(apples[i].color);
             apple.setPosition({(apples[i].position % horizontalCellsNumber) * cellSize * 1.f, 
-                (apples[i].position / horizontalCellsNumber) * cellSize * 1.f});
+                (apples[i].position / horizontalCellsNumber) * cellSize * 1.f + menuOffset});
             window.draw(apple);
         }
 
@@ -301,6 +477,7 @@ int main()
         // Print score text
         sf::Text scoreText(font);
         scoreText.setCharacterSize(50);
+        scoreText.setPosition({0, menuOffset * 1.f});
         std::string scorePrefix = (mode == "normal") ? "Score: " : "Social  credit: ";
         scoreText.setString(scorePrefix + std::to_string(snake.body.size()));
         window.draw(scoreText);
@@ -308,6 +485,10 @@ int main()
         // Print debug info
         // std::cout << snake.body.size() << std::endl;
 
+        ImGui::SFML::Render(window);
         window.display();
     }
+
+    settings.Save("settings.txt");
+    ImGui::SFML::Shutdown();
 }
