@@ -25,7 +25,6 @@
     ```
 1. Run 
 ```
-mkdir build
 chmod +x compile.sh
 ./compile.sh
 ```
