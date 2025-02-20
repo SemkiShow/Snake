@@ -1,5 +1,6 @@
 #!/bin/bash
 # Compiling for Linux
+mkdir build
 cd build &&
 cmake .. -DCMAKE_BUILD_TYPE=Release &&
 make &&
@@ -7,6 +8,7 @@ cd ..
 cp build/bin/main main
 
 # Compiling for Windows
+mkdir build_win
 cd build_win &&
 cmake .. -DCMAKE_BUILD_TYPE=Release --toolchain ../mingw-w64-x86_64.cmake &&
 make &&
