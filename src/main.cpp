@@ -123,6 +123,7 @@ void Settings::Load(std::string fileName)
     colorBuffer = Split(settingsList[6].substr(12), ',');
     for (int i = 0; i < 3; i++)
         appleColor[i] = stof(colorBuffer[i]);
+    delete[] colorBuffer;
     applesNumber = stoi(settingsList[7].substr(14));
 }
 
