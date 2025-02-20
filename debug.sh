@@ -1,7 +1,7 @@
 #!/bin/bash
-mkdir build
-cd build &&
+mkdir debug
+cd debug &&
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. &&
 make &&
 cd .. &&
-gdb ./build/bin/main
+gdb ./debug/bin/main

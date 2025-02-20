@@ -2,6 +2,7 @@ commit.sh
 backup.sh
 main.exe
 build*/*
+debug/
 out
 .cache
 .idea
