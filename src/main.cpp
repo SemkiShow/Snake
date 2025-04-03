@@ -26,6 +26,7 @@ std::string mode = "normal";
 std::string buf;
 
 sf::Music bgMusic;
+sf::Music pauseMusic;
 char lastKeyPress = 'R';
 bool keyBuffer[4];
 
@@ -172,6 +173,8 @@ void Restart()
         apples[i].color = sf::Color(settings.appleColor[0] * 255, settings.appleColor[1] * 255, settings.appleColor[2] * 255);
     }
     isGameOver = false;
+    isPaused = false;
+    pauseMusic.stop();
     bgMusic.play();
 }
 
@@ -253,7 +256,7 @@ int main()
     bgMusic.setLooping(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
-    sf::Music pauseMusic("assets/pause-music.mp3");
+    (void) pauseMusic.openFromFile("assets/pause-music.mp3");
     pauseMusic.setLooping(true);
     pauseMusic.setVolume(50.f);
     sf::SoundBuffer pickupBuffer("assets/pickup.wav");
@@ -357,14 +360,18 @@ int main()
             }
 
             // Check collision with the walls
-            if (snake.body[snake.body.size()-1] < 0 && snake.direction == 'U')
-                snake.body[snake.body.size()-1] += horizontalCellsNumber * (windowHeight / cellSize) + horizontalCellsNumber;
-            if (snake.body[snake.body.size()-1]-horizontalCellsNumber >= horizontalCellsNumber * (windowHeight / cellSize) && snake.direction == 'D')
-                snake.body[snake.body.size()-1] -= horizontalCellsNumber * (windowHeight / cellSize) + horizontalCellsNumber;
-            if ((snake.body[snake.body.size()-1]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
-                snake.body[snake.body.size()-1] += horizontalCellsNumber;
-            if (snake.body[snake.body.size()-1] % horizontalCellsNumber == 0 && snake.direction == 'R')
-                snake.body[snake.body.size()-1] -= horizontalCellsNumber;
+            std::cout << snake.body[snake.body.size()-1] << "\n";
+            for (int i = snake.body.size()-1; i < snake.body.size(); i++)
+            {
+                if (snake.body[i] < 0)
+                    snake.body[i] += horizontalCellsNumber * (windowHeight / cellSize);
+                else if (snake.body[i] >= horizontalCellsNumber * (windowHeight / cellSize))
+                    snake.body[i] -= horizontalCellsNumber * (windowHeight / cellSize);
+                else if ((snake.body[i]+1) % horizontalCellsNumber == 0 && snake.direction == 'L')
+                    snake.body[i] += horizontalCellsNumber;
+                else if (snake.body[i] % horizontalCellsNumber == 0 && snake.direction == 'R')
+                    snake.body[i] -= horizontalCellsNumber;
+            }
 
             // Check self-collision
             for (int i = 0; i < snake.body.size(); i++)

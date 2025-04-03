@@ -11,3 +11,5 @@ out
 *.zip
 release/
 imgui.ini
+score.txt
+settings.txt
