@@ -1,7 +1,7 @@
 commit.sh
 backup.sh
 main.exe
-build*/*
+build*/
 debug/
 out
 .cache
