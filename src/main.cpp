@@ -196,6 +196,50 @@ void ShowMenuBar()
     return;
 }
 
+void ProcessPlayerInput()
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && lastKeyPress != 'D')
+    {
+        if (keyBuffer[0] == false)
+        {
+            keyBuffer[0] = true;
+            lastKeyPress = 'U';
+            snake.keyBuffer.push_back('U');
+        }
+    }
+    else keyBuffer[0] = false;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && lastKeyPress != 'U')
+    {
+        if (keyBuffer[1] == false)
+        {
+            keyBuffer[1] = true;
+            lastKeyPress = 'D';
+            snake.keyBuffer.push_back('D');
+        }
+    }
+    else keyBuffer[1] = false;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && lastKeyPress != 'R')
+    {
+        if (keyBuffer[2] == false)
+        {
+            keyBuffer[2] = true;
+            lastKeyPress = 'L';
+            snake.keyBuffer.push_back('L');
+        }
+    }
+    else keyBuffer[2] = false;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && lastKeyPress != 'L')
+    {
+        if (keyBuffer[3] == false)
+        {
+            keyBuffer[3] = true;
+            lastKeyPress = 'R';
+            snake.keyBuffer.push_back('R');
+        }
+    }
+    else keyBuffer[3] = false;
+}
+
 int main()
 {
     // Non-SFML init
@@ -272,46 +316,7 @@ int main()
         window.clear();
 
         // Detect player input
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && lastKeyPress != 'D')
-        {
-            if (keyBuffer[0] == false)
-            {
-                keyBuffer[0] = true;
-                lastKeyPress = 'U';
-                snake.keyBuffer.push_back('U');
-            }
-        }
-        else keyBuffer[0] = false;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && lastKeyPress != 'U')
-        {
-            if (keyBuffer[1] == false)
-            {
-                keyBuffer[1] = true;
-                lastKeyPress = 'D';
-                snake.keyBuffer.push_back('D');
-            }
-        }
-        else keyBuffer[1] = false;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && lastKeyPress != 'R')
-        {
-            if (keyBuffer[2] == false)
-            {
-                keyBuffer[2] = true;
-                lastKeyPress = 'L';
-                snake.keyBuffer.push_back('L');
-            }
-        }
-        else keyBuffer[2] = false;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && lastKeyPress != 'L')
-        {
-            if (keyBuffer[3] == false)
-            {
-                keyBuffer[3] = true;
-                lastKeyPress = 'R';
-                snake.keyBuffer.push_back('R');
-            }
-        }
-        else keyBuffer[3] = false;
+        ProcessPlayerInput();
 
         // Snake physics stuff
         if (delayClock.getElapsedTime().asSeconds() >= std::max(1 / (snake.speed * sqrt(snake.body.size())), 1 / snake.maxSpeed) && !isGameOver && !isPaused)
