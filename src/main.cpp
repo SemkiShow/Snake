@@ -360,7 +360,6 @@ int main()
             }
 
             // Check collision with the walls
-            std::cout << snake.body[snake.body.size()-1] << "\n";
             for (int i = snake.body.size()-1; i < snake.body.size(); i++)
             {
                 if (snake.body[i] < 0)
