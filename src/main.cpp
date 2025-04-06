@@ -17,7 +17,6 @@ unsigned int windowWidth = 16*50*2;
 unsigned int windowHeight = 9*50*2;
 unsigned int windowSize[2] = {windowWidth - menuOffset, windowHeight + menuOffset};
 unsigned int cellSize = windowWidth / horizontalCellsNumber;
-bool verticalSync = true;
 
 bool isGameOver = false;
 bool isHighscore = false;
@@ -68,6 +67,7 @@ class Settings
         int applesNumber = 1;
         bool noSpeedLimit = false;
         bool autoMode = false;
+        bool vsync = true;
 }settings;
 
 std::string* Split(std::string input, char delimiter = ' ')
@@ -105,6 +105,7 @@ void Settings::Save(std::string fileName)
     settingsFile << "apples-number=" << applesNumber << '\n';
     settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
     settingsFile << "auto-mode=" << (autoMode ? "true" : "false") << "\n";
+    settingsFile << "vsync=" << (vsync ? "true" : "false") << "\n";
     settingsFile.close();
 }
 
@@ -133,7 +134,8 @@ void Settings::Load(std::string fileName)
     delete[] colorBuffer;
     applesNumber = stoi(settingsList[7].substr(14));
     noSpeedLimit = (settingsList[8] == "no-speed-limit=true") ? true : false;
-    autoMode = (settingsList[9] == "auto-mode=true") ? true : false;    
+    autoMode = (settingsList[9] == "auto-mode=true") ? true : false;
+    vsync = (settingsList[10] == "vsync=true") ? true : false;
 }
 
 void ShowSettings(bool* isOpen)
@@ -153,6 +155,7 @@ void ShowSettings(bool* isOpen)
     ImGui::SliderInt("apples-number", &settings.applesNumber, 1, 50);
     ImGui::Checkbox("no-speed-limit", &settings.noSpeedLimit);
     ImGui::Checkbox("auto-mode", &settings.autoMode);
+    ImGui::Checkbox("vsync", &settings.vsync);
     ImGui::End();
 }
 
@@ -304,16 +307,8 @@ int main()
     sf::Sound gameOverSound(gameOverBuffer);
     sf::Font font("assets/JetBrainsMonoNerdFont-Medium.ttf");
     sf::Texture backgroundTexture;
-    if (verticalSync)
-    {
-        window.setFramerateLimit(144);
-        window.setVerticalSyncEnabled(true);
-    }
-    else
-    {
-        window.setFramerateLimit(0);
-        window.setVerticalSyncEnabled(false);
-    }
+    window.setFramerateLimit(0);
+    window.setVerticalSyncEnabled(settings.vsync);
     
     // ImGUI init
     (void) ImGui::SFML::Init(window);
@@ -324,6 +319,7 @@ int main()
     int previousScale = horizontalCellsNumber;
     int previousApplesNumber = settings.applesNumber;
     bool previousAutoMode = settings.autoMode;
+    bool previousVsync = settings.vsync;
     while (window.isOpen())
     {
         while (const auto event = window.pollEvent())
@@ -404,7 +400,6 @@ int main()
                         snake.body.insert(snake.body.begin(), snake.lastTailPosition);
                         int newApplePosition = 0;
                         bool loop = snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize;
-                        // if (!loop) youWonSound.play();
                         while (loop)
                         {
                             loop = false;
@@ -510,6 +505,11 @@ int main()
                 previousApplesNumber = settings.applesNumber;
                 previousAutoMode = settings.autoMode;
                 Restart();
+            }
+            if (previousVsync != settings.vsync)
+            {
+                previousVsync = settings.vsync;
+                window.setVerticalSyncEnabled(settings.vsync);
             }
             snake.color = sf::Color(settings.snakeColor[0] * 255, settings.snakeColor[1] * 255, settings.snakeColor[2] * 255);
             for (int i = 0; i < apples.size(); i++)
