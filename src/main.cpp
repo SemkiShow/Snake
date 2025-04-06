@@ -65,6 +65,7 @@ class Settings
         float snakeColor[3];
         float appleColor[3];
         int applesNumber = 1;
+        bool noSpeedLimit = false;
 }settings;
 
 std::string* Split(std::string input, char delimiter = ' ')
@@ -100,6 +101,7 @@ void Settings::Save(std::string fileName)
     settingsFile << "snake-color=" << snakeColor[0] << ',' << snakeColor[1] << ',' << snakeColor[2] << '\n';
     settingsFile << "apple-color=" << appleColor[0] << ',' << appleColor[1] << ',' << appleColor[2] << '\n';
     settingsFile << "apples-number=" << applesNumber << '\n';
+    settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
     settingsFile.close();
 }
 
@@ -127,6 +129,7 @@ void Settings::Load(std::string fileName)
         appleColor[i] = stof(colorBuffer[i]);
     delete[] colorBuffer;
     applesNumber = stoi(settingsList[7].substr(14));
+    noSpeedLimit = (settingsList[8] == "no-speed-limit=true") ? true : false;
 }
 
 void ShowSettings(bool* isOpen)
@@ -144,6 +147,7 @@ void ShowSettings(bool* isOpen)
     ImGui::ColorEdit3("snake-color", settings.snakeColor);
     ImGui::ColorEdit3("apple-color", settings.appleColor);
     ImGui::SliderInt("apples-number", &settings.applesNumber, 1, 50);
+    ImGui::Checkbox("no-speed-limit", &settings.noSpeedLimit);
     ImGui::End();
 }
 
@@ -327,7 +331,7 @@ int main()
         ProcessPlayerInput();
 
         // Snake physics stuff
-        if (delayClock.getElapsedTime().asSeconds() >= std::max(1 / (snake.speed * sqrt(snake.body.size())), 1 / snake.maxSpeed) && !isGameOver && !isPaused)
+        if ((delayClock.getElapsedTime().asSeconds() >= std::max(1 / (snake.speed * sqrt(snake.body.size())), 1 / snake.maxSpeed) || settings.noSpeedLimit) && !isGameOver && !isPaused)
         {
             delayClock.restart();
 
