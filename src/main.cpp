@@ -41,6 +41,8 @@ class Snake
         std::vector<char> keyBuffer;
         double speed = 2;
         double maxSpeed = 20;
+        std::vector<char> directionHistory;
+        int lastTailPosition = 0;
 }snake;
     
 class Apple
@@ -48,7 +50,6 @@ class Apple
     public:
         unsigned int position;
         sf::Color color = sf::Color(255, 0, 0);
-        unsigned int nutritionValue = 1;
 };
 std::vector<Apple> apples;
     
@@ -66,6 +67,7 @@ class Settings
         float appleColor[3];
         int applesNumber = 1;
         bool noSpeedLimit = false;
+        bool autoMode = false;
 }settings;
 
 std::string* Split(std::string input, char delimiter = ' ')
@@ -102,6 +104,7 @@ void Settings::Save(std::string fileName)
     settingsFile << "apple-color=" << appleColor[0] << ',' << appleColor[1] << ',' << appleColor[2] << '\n';
     settingsFile << "apples-number=" << applesNumber << '\n';
     settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
+    settingsFile << "auto-mode=" << (autoMode ? "true" : "false") << "\n";
     settingsFile.close();
 }
 
@@ -130,6 +133,7 @@ void Settings::Load(std::string fileName)
     delete[] colorBuffer;
     applesNumber = stoi(settingsList[7].substr(14));
     noSpeedLimit = (settingsList[8] == "no-speed-limit=true") ? true : false;
+    autoMode = (settingsList[9] == "auto-mode=true") ? true : false;    
 }
 
 void ShowSettings(bool* isOpen)
@@ -148,6 +152,7 @@ void ShowSettings(bool* isOpen)
     ImGui::ColorEdit3("apple-color", settings.appleColor);
     ImGui::SliderInt("apples-number", &settings.applesNumber, 1, 50);
     ImGui::Checkbox("no-speed-limit", &settings.noSpeedLimit);
+    ImGui::Checkbox("auto-mode", &settings.autoMode);
     ImGui::End();
 }
 
@@ -163,6 +168,8 @@ void Restart()
     // snake.body.push_back(6);
     snake.color = sf::Color(settings.snakeColor[0] * 255, settings.snakeColor[1] * 255, settings.snakeColor[2] * 255);
     snake.direction = 'R';
+    snake.keyBuffer.clear();
+    snake.lastTailPosition = 0;
     lastKeyPress = 'R';
     keyBuffer[0] = false;
     keyBuffer[1] = false;
@@ -173,7 +180,6 @@ void Restart()
     {
         apples.push_back(Apple());
         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
-        apples[i].nutritionValue = 1;
         apples[i].color = sf::Color(settings.appleColor[0] * 255, settings.appleColor[1] * 255, settings.appleColor[2] * 255);
     }
     isGameOver = false;
@@ -247,6 +253,30 @@ void ProcessPlayerInput()
     else keyBuffer[3] = false;
 }
 
+std::string GenerateAutoModeKeypresses()
+{
+    std::string output = "";
+    for (int i = 0; i < horizontalCellsNumber - 3; i++)
+        output += 'R';
+    for (int i = 0; i < windowHeight / cellSize - 1; i++)
+        output += 'D';
+    for (int i = 0; i < horizontalCellsNumber / 2 - 1; i++)
+    {
+        output += 'L';
+        for (int j = 0; j < windowHeight / cellSize - 2; j++)
+            output += 'U';
+        output += 'L';
+        for (int j = 0; j < windowHeight / cellSize - 2; j++)
+            output += 'D';
+    }
+    output += 'L';
+    for (int i = 0; i < windowHeight / cellSize - 1; i++)
+        output += 'U';
+    for (int i = 0; i < 2; i++)
+        output += 'R';
+    return output;
+}
+
 int main()
 {
     // Non-SFML init
@@ -293,6 +323,7 @@ int main()
     sf::Clock delayClock;
     int previousScale = horizontalCellsNumber;
     int previousApplesNumber = settings.applesNumber;
+    bool previousAutoMode = settings.autoMode;
     while (window.isOpen())
     {
         while (const auto event = window.pollEvent())
@@ -335,6 +366,14 @@ int main()
         {
             delayClock.restart();
 
+            // Add keypresses to a keybuffer if it's empty and autoModee is true
+            if (snake.keyBuffer.size() == 0 && settings.autoMode == true)
+            {
+                buf = GenerateAutoModeKeypresses();
+                for (int i = 0; i < buf.size(); i++)
+                    snake.keyBuffer.push_back(buf[i]);
+            }
+
             // Change the snake's direction to the first key pressed in between the movement frames
             if (snake.keyBuffer.size() != 0)
             {
@@ -348,24 +387,52 @@ int main()
             if (snake.direction == 'D') snakeDirectionInteger = horizontalCellsNumber;
             if (snake.direction == 'L') snakeDirectionInteger = -1;
             if (snake.direction == 'R') snakeDirectionInteger = 1;
+            snake.lastTailPosition = snake.body[0];
             // Remove the last tail piece
             snake.body.erase(snake.body.begin());
             // Move the head
             snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
 
             // Check apple collision
+            bool hasCollided = false;
             for (int i = 0; i < apples.size(); i++)
             {
                 for (int j = 0; j < snake.body.size(); j++)
                 {
                     if (snake.body[j] == apples[i].position)
                     {
-                        for (int k = 0; k < apples[i].nutritionValue; k++)
-                            snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
-                        apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+                        snake.body.insert(snake.body.begin(), snake.lastTailPosition);
+                        int newApplePosition = 0;
+                        bool loop = snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize;
+                        // if (!loop) youWonSound.play();
+                        while (loop)
+                        {
+                            loop = false;
+                            newApplePosition = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+                            for (int k = 0; k < snake.body.size(); k++)
+                            {
+                                if (snake.body[k] == newApplePosition)
+                                {
+                                    loop = true;
+                                    break;
+                                }
+                            }
+                            for (int k = 0; k < apples.size(); k++)
+                            {
+                                if (apples[k].position == newApplePosition)
+                                {
+                                    loop = true;
+                                    break;
+                                }
+                            }
+                        }
+                        apples[i].position = newApplePosition;
                         pickupSound.play();
+                        hasCollided = true;
+                        break;
                     }
                 }
+                if (hasCollided) break;
             }
 
             // Check collision with the walls
@@ -388,7 +455,8 @@ int main()
                 {
                     if (snake.body[i] == snake.body[j] && i != j)
                     {
-                        gameOverSound.play();
+                        if (snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
+                            gameOverSound.play();
                         std::fstream scoreListFile;
                         scoreListFile.open("score.txt", std::ios::in);
                         std::vector<int> scores;
@@ -436,10 +504,11 @@ int main()
             // cellSize = windowWidth / horizontalCellsNumber;
             cellSize = settings.scale;
             horizontalCellsNumber = windowWidth / cellSize;
-            if (settings.scale != previousScale || settings.applesNumber != previousApplesNumber)
+            if (settings.scale != previousScale || settings.applesNumber != previousApplesNumber || settings.autoMode != previousAutoMode)
             {
                 previousScale = settings.scale;
                 previousApplesNumber = settings.applesNumber;
+                previousAutoMode = settings.autoMode;
                 Restart();
             }
             snake.color = sf::Color(settings.snakeColor[0] * 255, settings.snakeColor[1] * 255, settings.snakeColor[2] * 255);
@@ -477,7 +546,10 @@ int main()
         for (int i = 0; i < apples.size(); i++)
         {
             sf::RectangleShape apple({cellSize * 1.f, cellSize * 1.f});
-            apple.setFillColor(apples[i].color);
+            if (snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
+                apple.setFillColor(apples[i].color);
+            else
+                apple.setFillColor(snake.color);
             apple.setPosition({(apples[i].position % horizontalCellsNumber) * cellSize * 1.f, 
                 (apples[i].position / horizontalCellsNumber) * cellSize * 1.f + menuOffset});
             window.draw(apple);
@@ -485,7 +557,7 @@ int main()
 
         // Print game over is necessary
         if (isGameOver && mode == "china") bgMusic.stop();
-        if (isGameOver && mode == "normal")
+        if (isGameOver && mode == "normal" && snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
         {
             bgMusic.stop();
             sf::Text gameOverText(font);
@@ -496,7 +568,7 @@ int main()
             window.draw(gameOverText);
         }
         // Print the highscore text is necessary
-        if (isHighscore && isGameOver)
+        if (isHighscore && isGameOver && snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
         {
             sf::Text highscoreText(font);
             highscoreText.setCharacterSize(0.05f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
@@ -527,6 +599,18 @@ int main()
         std::string scorePrefix = (mode == "normal") ? "Score: " : "Social  credit: ";
         scoreText.setString(scorePrefix + std::to_string(snake.body.size()));
         window.draw(scoreText);
+
+        // Print You Won! text
+        if (snake.body.size() + apples.size() >= horizontalCellsNumber * windowHeight / cellSize)
+        {
+            bgMusic.stop();
+            sf::Text youWonText(font);
+            youWonText.setCharacterSize(0.135f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
+            youWonText.setPosition({windowWidth * .15f, windowHeight * .3f});
+            youWonText.setFillColor(sf::Color(255, 255, 0));
+            youWonText.setString("You won!");
+            window.draw(youWonText);
+        }
 
         // Print debug info
         // std::cout << snake.body.size() << std::endl;
