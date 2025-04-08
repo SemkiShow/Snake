@@ -399,29 +399,36 @@ int main()
                     {
                         snake.body.insert(snake.body.begin(), snake.lastTailPosition);
                         int newApplePosition = 0;
-                        bool loop = snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize;
-                        while (loop)
+                        bool loop = snake.body.size() + apples.size() - 1 < horizontalCellsNumber * windowHeight / cellSize;
+                        if (loop)
                         {
-                            loop = false;
-                            newApplePosition = rand() % (horizontalCellsNumber * windowHeight / cellSize);
-                            for (int k = 0; k < snake.body.size(); k++)
+                            while (loop)
                             {
-                                if (snake.body[k] == newApplePosition)
+                                loop = false;
+                                newApplePosition = rand() % (horizontalCellsNumber * windowHeight / cellSize);
+                                for (int k = 0; k < snake.body.size(); k++)
                                 {
-                                    loop = true;
-                                    break;
+                                    if (snake.body[k] == newApplePosition)
+                                    {
+                                        loop = true;
+                                        break;
+                                    }
+                                }
+                                for (int k = 0; k < apples.size(); k++)
+                                {
+                                    if (apples[k].position == newApplePosition)
+                                    {
+                                        loop = true;
+                                        break;
+                                    }
                                 }
                             }
-                            for (int k = 0; k < apples.size(); k++)
-                            {
-                                if (apples[k].position == newApplePosition)
-                                {
-                                    loop = true;
-                                    break;
-                                }
-                            }
+                            apples[i].position = newApplePosition;
                         }
-                        apples[i].position = newApplePosition;
+                        else
+                        {
+                            apples.erase(apples.begin() + i);
+                        }
                         pickupSound.play();
                         hasCollided = true;
                         break;
@@ -546,10 +553,10 @@ int main()
         for (int i = 0; i < apples.size(); i++)
         {
             sf::RectangleShape apple({cellSize * 1.f, cellSize * 1.f});
-            if (snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
+            // if (snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
                 apple.setFillColor(apples[i].color);
-            else
-                apple.setFillColor(snake.color);
+            // else
+            //     apple.setFillColor(snake.color);
             apple.setPosition({(apples[i].position % horizontalCellsNumber) * cellSize * 1.f, 
                 (apples[i].position / horizontalCellsNumber) * cellSize * 1.f + menuOffset});
             window.draw(apple);
@@ -557,7 +564,7 @@ int main()
 
         // Print game over is necessary
         if (isGameOver && mode == "china") bgMusic.stop();
-        if (isGameOver && mode == "normal" && snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
+        if (isGameOver && mode == "normal" && snake.body.size() < horizontalCellsNumber * windowHeight / cellSize)
         {
             bgMusic.stop();
             sf::Text gameOverText(font);
@@ -568,7 +575,7 @@ int main()
             window.draw(gameOverText);
         }
         // Print the highscore text is necessary
-        if (isHighscore && isGameOver && snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
+        if (isHighscore && isGameOver && snake.body.size() < horizontalCellsNumber * windowHeight / cellSize)
         {
             sf::Text highscoreText(font);
             highscoreText.setCharacterSize(0.05f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
@@ -601,7 +608,7 @@ int main()
         window.draw(scoreText);
 
         // Print You Won! text
-        if (snake.body.size() + apples.size() >= horizontalCellsNumber * windowHeight / cellSize)
+        if (snake.body.size() >= horizontalCellsNumber * windowHeight / cellSize)
         {
             bgMusic.stop();
             sf::Text youWonText(font);
