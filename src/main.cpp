@@ -23,9 +23,11 @@ bool isHighscore = false;
 bool isPaused = false;
 std::string mode = "normal";
 std::string buf;
+std::vector<int> scores;
 
 sf::Music bgMusic;
 sf::Music pauseMusic;
+sf::Texture backgroundTexture;
 char lastKeyPress = 'R';
 bool keyBuffer[4];
 
@@ -173,11 +175,13 @@ void Restart()
     snake.direction = 'R';
     snake.keyBuffer.clear();
     snake.lastTailPosition = 0;
+
     lastKeyPress = 'R';
     keyBuffer[0] = false;
     keyBuffer[1] = false;
     keyBuffer[2] = false;
     keyBuffer[3] = true;
+
     apples.clear();
     for (int i = 0; i < settings.applesNumber; i++)
     {
@@ -185,8 +189,18 @@ void Restart()
         apples[i].position = rand() % (horizontalCellsNumber * windowHeight / cellSize);
         apples[i].color = sf::Color(settings.appleColor[0] * 255, settings.appleColor[1] * 255, settings.appleColor[2] * 255);
     }
+    
     isGameOver = false;
     isPaused = false;
+    (void) backgroundTexture.loadFromFile("assets/china-bg.jpg");
+
+    scores.clear();
+    std::fstream scoreListFile;
+    scoreListFile.open("score.txt", std::ios::in);
+    while (std::getline(scoreListFile, buf))
+        scores.push_back(stoi(buf));
+    scoreListFile.close();
+
     pauseMusic.stop();
     bgMusic.play();
 }
@@ -306,7 +320,7 @@ int main()
     sf::SoundBuffer gameOverBuffer("assets/game-over.wav");
     sf::Sound gameOverSound(gameOverBuffer);
     sf::Font font("assets/JetBrainsMonoNerdFont-Medium.ttf");
-    sf::Texture backgroundTexture;
+    backgroundTexture.setSmooth(true);
     window.setFramerateLimit(0);
     window.setVerticalSyncEnabled(settings.vsync);
     
@@ -429,6 +443,19 @@ int main()
                         {
                             apples.erase(apples.begin() + i);
                         }
+                        if (snake.body.size() >= horizontalCellsNumber * windowHeight / cellSize)
+                        {
+                            scores.push_back(snake.body.size());
+                            std::sort(scores.begin(), scores.end());
+                            std::fstream scoreListFile;
+                            scoreListFile.open("score.txt", std::ios::out);
+                            for (int k = 0; k < scores.size(); k++)
+                            {
+                                scoreListFile << scores[k];
+                                if (k != scores.size()-1) scoreListFile << "\n";
+                            }
+                            scoreListFile.close();
+                        }
                         pickupSound.play();
                         hasCollided = true;
                         break;
@@ -459,23 +486,19 @@ int main()
                     {
                         if (snake.body.size() + apples.size() < horizontalCellsNumber * windowHeight / cellSize)
                             gameOverSound.play();
-                        std::fstream scoreListFile;
-                        scoreListFile.open("score.txt", std::ios::in);
-                        std::vector<int> scores;
-                        while (std::getline(scoreListFile, buf))
-                            scores.push_back(stoi(buf));
                         scores.push_back(snake.body.size());
                         std::sort(scores.begin(), scores.end());
-                        scoreListFile.close();
+                        std::fstream scoreListFile;
                         scoreListFile.open("score.txt", std::ios::out);
                         for (int k = 0; k < scores.size(); k++)
                         {
                             scoreListFile << scores[k];
-                            if (k != scores.size()-1) scoreListFile << std::endl;
+                            if (k != scores.size()-1) scoreListFile << "\n";
                         }
                         scoreListFile.close();
                         if (snake.body.size() >= scores[scores.size()-1]) isHighscore = true;
                         isGameOver = true;
+                        if (mode == "china") (void) backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
                     }
                     if (isGameOver) break;
                 }
@@ -528,11 +551,6 @@ int main()
         // Print the background if it's china mode
         if (mode == "china")
         {
-            if (isGameOver)
-                (void) backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
-            else
-                (void) backgroundTexture.loadFromFile("assets/china-bg.jpg");
-            backgroundTexture.setSmooth(true);
             sf::Sprite backgroundSprite(backgroundTexture);
             backgroundSprite.setScale({0.84, 0.84});
             backgroundSprite.setPosition({0, menuOffset * 1.f});
@@ -584,13 +602,6 @@ int main()
             highscoreText.setString("Highscore!");
             window.draw(highscoreText);
 
-            std::fstream scoreListFile;
-            scoreListFile.open("score.txt", std::ios::in);
-            std::vector<int> scores;
-            while (std::getline(scoreListFile, buf))
-                scores.push_back(stoi(buf));
-            scoreListFile.close();
-
             sf::Text lastBestScoreText(font);
             lastBestScoreText.setCharacterSize(0.03f * sqrt(windowWidth * windowWidth + windowHeight * windowHeight));
             lastBestScoreText.setPosition({windowWidth * .325f, windowHeight * .7f});
@@ -618,9 +629,6 @@ int main()
             youWonText.setString("You won!");
             window.draw(youWonText);
         }
-
-        // Print debug info
-        // std::cout << snake.body.size() << std::endl;
 
         ImGui::SFML::Render(window);
         window.display();
