@@ -2,6 +2,7 @@
 
 set -e
 
+./reset_save_files.sh --soft
 if [ ! -d debug ]; then
     mkdir debug
 fi
