@@ -300,14 +300,8 @@ int main()
     Restart();
     srand(time(0));
     settings.Load("settings.txt");
-    std::fstream versionFile;
-    versionFile.open("version.txt", std::ios::in);
-    std::vector<std::string> versionFileContents;
-    while (std::getline(versionFile, buf))
-        versionFileContents.push_back(buf);
-    versionFile.close();
     // SFML init
-    sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake " + versionFileContents[0]);
+    sf::RenderWindow window(sf::VideoMode({windowSize[0], windowSize[1]}), "Snake");
     (void) bgMusic.openFromFile("assets/snake-bg.mp3");
     bgMusic.setLooping(true);
     bgMusic.setVolume(50.f);

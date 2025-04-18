@@ -1,7 +1,12 @@
 #!/bin/bash
-mkdir debug
-cd debug &&
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. &&
-make &&
-cd .. &&
+
+set -e
+
+if [ ! -d debug ]; then
+    mkdir debug
+fi
+cd debug
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+make
+cd ..
 gdb ./debug/bin/main
