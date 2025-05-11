@@ -28,7 +28,3 @@
 chmod +x compile.sh
 ./compile.sh
 ```
-
-## License
-
-The source code is licensed under MIT.
