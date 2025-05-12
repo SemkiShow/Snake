@@ -45,8 +45,7 @@ FetchContent_MakeAvailable(imgui-sfml)
 
 file(GLOB SOURCES src/*.cpp)
 
-add_executable(main)
-target_sources(main PRIVATE ${SOURCES})
+add_executable(main ${SOURCES})
 target_compile_features(main PRIVATE cxx_std_17)
 target_include_directories(main PRIVATE src/include/)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Audio)
