@@ -27,4 +27,5 @@
 ```
 chmod +x compile.sh
 ./compile.sh
+./build/bin/main
 ```
