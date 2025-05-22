@@ -23,10 +23,10 @@ cd ..
 cp build_win/bin/main.exe .
 
 # Zipping the build
-rm release.zip
 ./reset_save_files.sh
 zip release.zip main main.exe assets/* LICENSE README.md score.txt settings.txt
 rm main main.exe
 
 # Creating a GitHub release
 gh release create $1 release.zip
+rm release.zip
