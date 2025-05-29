@@ -6,13 +6,8 @@ set -e
 if [ "$1" == "" ]; then
     clear
     ./reset_save_files.sh --soft
-    if [ ! -d build ]; then
-        mkdir build
-    fi
-    cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-    make
-    cd ..
+    cmake -B build
+    cmake --build build -j ${nproc}
     ./build/bin/main
 fi
 
@@ -20,13 +15,8 @@ fi
 if [ "$1" == "-d" ] || [ "$1" == "--debug" ]; then
     clear
     ./reset_save_files.sh --soft
-    if [ ! -d debug ]; then
-        mkdir debug
-    fi
-    cd debug
-    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    make
-    cd ..
+    cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+    cmake --build debug -j ${nproc}
     gdb -ex run ./debug/bin/main
 fi
 
