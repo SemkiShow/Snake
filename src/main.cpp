@@ -35,6 +35,7 @@ int main()
     bgMusic = LoadMusicStream("resources/snake-bg.wav");
     PlayMusicStream(bgMusic);
     funMusic = LoadMusicStream("resources/china-bg.wav");
+    SetMusicVolume(funMusic, 2);
     pauseMusic = LoadMusicStream("resources/pause-music.wav");
     pickupSound = LoadSound("resources/pickup.wav");
     gameOverSound = LoadSound("resources/game-over.wav");
