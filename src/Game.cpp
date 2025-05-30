@@ -22,8 +22,9 @@ std::vector<Apple> apples;
 
 double delayClock;
 char lastKeyPress = 'R';
-int lastScale = scale;
-int lastApplesNumber = applesNumber;
+float lastFunModeLevel = funModeLevelFloat;
+float lastScale = scaleFloat;
+float lastApplesNumber = applesNumberFloat;
 bool lastAutoMode = autoMode;
 bool lastVsync = vsync;
 Color lastAppleColor;
@@ -118,9 +119,15 @@ std::string GenerateAutoModeKeypresses()
 
 void UpdateSettings()
 {
-    if (applesNumber != lastApplesNumber)
+    if (lastFunModeLevel != funModeLevelFloat)
     {
-        lastApplesNumber = applesNumber;
+        lastFunModeLevel = funModeLevelFloat;
+        funModeLevel = funModeLevelFloat;
+    }
+    if (lastApplesNumber != applesNumberFloat)
+    {
+        lastApplesNumber = applesNumberFloat;
+        applesNumber = applesNumberFloat;
         apples.clear();
         for (int i = 0; i < applesNumber; i++)
         {
@@ -129,11 +136,13 @@ void UpdateSettings()
             apples[i].color = appleColor;
         }
     }
-    if (scale != lastScale || applesNumber != lastApplesNumber || autoMode != lastAutoMode)
+    if (lastScale != scaleFloat || lastApplesNumber != applesNumberFloat || lastAutoMode != autoMode)
     {
-        lastScale = scale;
+        lastScale = scaleFloat;
+        scale = scaleFloat;
         horizontalCellsNumber = floor(windowSize[0] / scale);
-        lastApplesNumber = applesNumber;
+        lastApplesNumber = applesNumberFloat;
+        applesNumber = applesNumberFloat;
         lastAutoMode = autoMode;
         Restart();
     }
