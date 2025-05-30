@@ -1,4 +1,5 @@
 #include <random>
+#include <ctime>
 #include "Settings.hpp"
 #include "UI.hpp"
 #include "Game.hpp"

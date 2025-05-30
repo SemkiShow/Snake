@@ -3,23 +3,13 @@
 set -e
 
 # Compiling for Linux
-if [ ! -d build ]; then
-    mkdir build
-fi
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make
-cd ..
+cmake -B build
+cmake --build build -j ${nproc}
 cp build/bin/main main
 
 # Compiling for Windows
-if [ ! -d build_win ]; then
-    mkdir build_win
-fi
-cd build_win
-cmake .. -DCMAKE_BUILD_TYPE=Release --toolchain ../mingw-w64-x86_64.cmake
-make
-cd ..
+cmake -B build_win --toolchain ../mingw-w64-x86_64.cmake
+cmake --build build_win -j ${nproc}
 cp build_win/bin/main.exe .
 
 # Zipping the build
