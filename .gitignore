@@ -1,6 +1,4 @@
 build*/
-debug/
-web/
 .vscode
 score.txt
 settings.txt

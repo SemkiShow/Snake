@@ -15,18 +15,18 @@ fi
 if [ "$1" == "-d" ] || [ "$1" == "--debug" ]; then
     clear
     ./reset_save_files.sh --soft
-    cmake -B debug -DCMAKE_BUILD_TYPE=Debug
-    cmake --build debug -j ${nproc}
-    gdb -ex run ./debug/bin/main
+    cmake -B build_debug -DCMAKE_BUILD_TYPE=Debug
+    cmake --build build_debug -j ${nproc}
+    gdb -ex run ./build_debug/bin/main
 fi
 
 # Web build
 if [ "$1" == "-w" ] || [ "$1" == "--web" ]; then
     clear
     ./reset_save_files.sh --soft
-    emcmake cmake -B web -DPLATFORM=Web
-    cmake --build web -j ${nproc}
-    emrun ./web/bin/main.html
+    emcmake cmake -B build_web -DPLATFORM=Web
+    cmake --build build_web -j ${nproc}
+    emrun ./build_web/bin/main.html
 fi
 
 # Help info
