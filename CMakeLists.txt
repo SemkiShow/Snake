@@ -1,52 +1,66 @@
 cmake_minimum_required(VERSION 3.28)
-project(Snake LANGUAGES CXX)
+project(SampleRaylibProject)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+if (UNIX)
+    set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Build GLFW Wayland support")
+    set(GLFW_BUILD_X11 ON CACHE BOOL "Build GLFW X11 support")
+endif()
 
 include(FetchContent)
 
-set(SFML_VERSION 3.0.0)
-set(IMGUI_VERSION 1.91.1)
-set(IMGUI_SFML_VERSION 3.0)
+# Generate compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# It's nice to get stripped-down release zips instead of cloning
-# a repo and checking out a tag
+# Set the default build type to Release
+set(CMAKE_BUILD_TYPE Release)
+
+# Dependencies
+set(RAYLIB_VERSION 5.5)
+set(RAYGUI_VERSION 4.0)
+
 FetchContent_Declare(
-  SFML
-  URL "https://github.com/SFML/SFML/archive/${SFML_VERSION}.zip"
+    raylib
+    DOWNLOAD_EXTRACT_TIMESTAMP OFF
+    URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
+    FIND_PACKAGE_ARGS
 )
+FetchContent_MakeAvailable(raylib)
 
+# Raygui
 FetchContent_Declare(
-  imgui
-  URL https://github.com/ocornut/imgui/archive/v${IMGUI_VERSION}.zip
+    raygui
+    URL https://github.com/raysan5/raygui/archive/refs/tags/${RAYGUI_VERSION}.tar.gz
 )
+FetchContent_MakeAvailable(raygui)
+add_subdirectory(${raygui_SOURCE_DIR}/projects/CMake)
 
-# Or by tag...
-FetchContent_Declare(
-  imgui-sfml
-  URL https://github.com/SFML/imgui-sfml/archive/v${IMGUI_SFML_VERSION}.zip
-)
-
-## finally, let's build
-
-# SFML
-FetchContent_MakeAvailable(sfml)
-
-# Dear ImGui
-FetchContent_MakeAvailable(imgui)
-
-# ImGui-SFML
-set(IMGUI_DIR ${imgui_SOURCE_DIR})
-set(IMGUI_INCLUDE_DIR ${imgui_SOURCE_DIR})
-option(IMGUI_SFML_FIND_SFML "Use find_package to find SFML" OFF)
-option(IMGUI_SFML_IMGUI_DEMO "Build imgui_demo.cpp" OFF)
-
-FetchContent_MakeAvailable(imgui-sfml)
-
+# Our Project
 file(GLOB SOURCES src/*.cpp)
 
 add_executable(main ${SOURCES})
+target_include_directories(main PRIVATE include/)
 target_compile_features(main PRIVATE cxx_std_17)
-target_include_directories(main PRIVATE src/include/)
-target_link_libraries(main PRIVATE SFML::Graphics SFML::Audio)
-target_link_libraries(main PUBLIC ImGui-SFML::ImGui-SFML)
+set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(main raylib raygui)
+
+# Web Configurations
+if ("${PLATFORM}" STREQUAL "Web")
+    # Tell Emscripten to build an example.html file.
+    set_target_properties(main PROPERTIES SUFFIX ".html")
+    target_link_options(main PUBLIC 
+        "-sASSERTIONS=1"
+        "-sFORCE_FILESYSTEM"
+        "-sALLOW_MEMORY_GROWTH"
+        "-sUSE_GLFW=3"
+        "-sEXPORTED_RUNTIME_METHODS=['HEAPF32']"
+        "--preload-file" "${CMAKE_SOURCE_DIR}/resources@resources"
+        # "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html"
+    )
+endif()
+
+# Checks if OSX and links appropriate frameworks (Only required on MacOS)
+if (APPLE)
+    target_link_libraries(main "-framework IOKit")
+    target_link_libraries(main "-framework Cocoa")
+    target_link_libraries(main "-framework OpenGL")
+endif()

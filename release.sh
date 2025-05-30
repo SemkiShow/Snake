@@ -24,7 +24,7 @@ cp build_win/bin/main.exe .
 
 # Zipping the build
 ./reset_save_files.sh
-zip release.zip main main.exe assets/* LICENSE README.md score.txt settings.txt
+zip release.zip main main.exe resources/* LICENSE README.md score.txt settings.txt
 rm main main.exe
 
 # Creating a GitHub release

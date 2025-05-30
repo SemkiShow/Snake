@@ -1,4 +1,7 @@
 #include "Game.hpp"
+#include "Settings.hpp"
+
+Snake snake;
 
 void Snake::CheckAppleCollision()
 {
@@ -11,13 +14,13 @@ void Snake::CheckAppleCollision()
             {
                 body.insert(body.begin(), lastTailPosition);
                 int newApplePosition = 0;
-                bool loop = body.size() + apples.size() - 1 < windowSize[0] / cellSize * windowSize[1] / cellSize;
+                bool loop = body.size() + apples.size() - 1 < windowSize[0] / scale * windowSize[1] / scale;
                 if (loop)
                 {
                     while (loop)
                     {
                         loop = false;
-                        newApplePosition = rand() % (windowSize[0] / cellSize * windowSize[1] / cellSize);
+                        newApplePosition = rand() % (windowSize[0] / scale * windowSize[1] / scale);
                         for (int k = 0; k < body.size(); k++)
                         {
                             if (body[k] == newApplePosition)
@@ -41,7 +44,7 @@ void Snake::CheckAppleCollision()
                 {
                     apples.erase(apples.begin() + i);
                 }
-                if (body.size() >= windowSize[0] / cellSize * windowSize[1] / cellSize)
+                if (body.size() >= windowSize[0] / scale * windowSize[1] / scale)
                 {
                     scores.push_back(body.size());
                     std::sort(scores.begin(), scores.end());
@@ -54,7 +57,7 @@ void Snake::CheckAppleCollision()
                     }
                     scoreListFile.close();
                 }
-                pickupSound.play();
+                PlaySound(pickupSound);
                 hasCollided = true;
                 break;
             }
@@ -69,9 +72,9 @@ void Snake::CheckWallCollision()
     for (int i = body.size()-1; i < body.size(); i++)
     {
         if (body[i] < 0)
-            body[i] += horizontalCellsNumber * (windowSize[1] / cellSize);
-        else if (body[i] >= horizontalCellsNumber * (windowSize[1] / cellSize))
-            body[i] -= horizontalCellsNumber * (windowSize[1] / cellSize);
+            body[i] += horizontalCellsNumber * (windowSize[1] / scale);
+        else if (body[i] >= horizontalCellsNumber * (windowSize[1] / scale))
+            body[i] -= horizontalCellsNumber * (windowSize[1] / scale);
         else if ((body[i]+1) % horizontalCellsNumber == 0 && direction == 'L')
             body[i] += horizontalCellsNumber;
         else if (body[i] % horizontalCellsNumber == 0 && direction == 'R')
@@ -87,8 +90,8 @@ void Snake::CheckSelfCollision()
         {
             if (body[i] == body[j] && i != j)
             {
-                if (body.size() + apples.size() < horizontalCellsNumber * windowSize[1] / cellSize)
-                    gameOverSound.play();
+                if (body.size() + apples.size() < horizontalCellsNumber * windowSize[1] / scale)
+                    PlaySound(gameOverSound);
                 scores.push_back(body.size());
                 std::sort(scores.begin(), scores.end());
                 std::fstream scoreListFile;
@@ -101,7 +104,6 @@ void Snake::CheckSelfCollision()
                 scoreListFile.close();
                 if (body.size() >= scores[scores.size()-1]) isHighscore = true;
                 isGameOver = true;
-                if (mode == "china") (void) backgroundTexture.loadFromFile("assets/china-bg-gameover.jpg");
             }
             if (isGameOver) break;
         }

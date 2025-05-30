@@ -1,4 +1,16 @@
 #include "Settings.hpp"
+#include "Game.hpp"
+
+bool funMode = false;
+int funModeLevel = 5;
+float speed = 2;
+float maxSpeed = 20;
+int scale = 32;
+Color appleColor = Color{255, 0, 0, 255};
+int applesNumber = 1;
+bool noSpeedLimit = false;
+bool autoMode = false;
+bool vsync = true;
 
 std::vector<std::string> Split(std::string input, char delimiter)
 {
@@ -18,18 +30,18 @@ std::vector<std::string> Split(std::string input, char delimiter)
     return output;
 }
 
-void Settings::Save(std::string fileName)
+void Save(std::string fileName)
 {
     // Read the file
     std::fstream settingsFile;
     settingsFile.open(fileName, std::ios::out);
     settingsFile << "fun-mode=" << (funMode ? "true" : "false") << "\n";
     settingsFile << "fun-mode-level=" << funModeLevel << "\n";
-    settingsFile << "speed=" << speed << '\n';
-    settingsFile << "max-speed=" << maxSpeed << '\n';
+    settingsFile << "speed=" << snake.speed << '\n';
+    settingsFile << "max-speed=" << snake.maxSpeed << '\n';
     settingsFile << "scale=" << scale << '\n';
-    settingsFile << "snake-color=" << snakeColor[0] << ',' << snakeColor[1] << ',' << snakeColor[2] << '\n';
-    settingsFile << "apple-color=" << appleColor[0] << ',' << appleColor[1] << ',' << appleColor[2] << '\n';
+    settingsFile << "snake-color=" << (int)snake.color.r << ',' << (int)snake.color.g  << ',' << (int)snake.color.b << '\n';
+    settingsFile << "apple-color=" << (int)appleColor.r << ',' << (int)appleColor.g << ',' << (int)appleColor.b << '\n';
     settingsFile << "apples-number=" << applesNumber << '\n';
     settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
     settingsFile << "auto-mode=" << (autoMode ? "true" : "false") << "\n";
@@ -37,7 +49,7 @@ void Settings::Save(std::string fileName)
     settingsFile.close();
 }
 
-void Settings::Load(std::string fileName)
+void Load(std::string fileName)
 {
     // Read the file
     std::fstream settingsFile;
@@ -49,19 +61,23 @@ void Settings::Load(std::string fileName)
     settingsFile.close();
 
     // Process the file
-    funMode = (settingsList[0] == "fun-mode=true") ? true : false;
+    funMode = settingsList[0] == "fun-mode=true";
     funModeLevel = stoi(settingsList[1].substr(15));
-    speed = stof(settingsList[2].substr(6));
-    maxSpeed = stof(settingsList[3].substr(10));
+    snake.speed = stof(settingsList[2].substr(6));
+    snake.maxSpeed = stof(settingsList[3].substr(10));
     scale = stoi(settingsList[4].substr(6));
     std::vector<std::string> colorBuffer = Split(settingsList[5].substr(12), ',');
-    for (int i = 0; i < 3; i++)
-        snakeColor[i] = stof(colorBuffer[i]);
+    snake.color.r = stoi(colorBuffer[0]);
+    snake.color.g = stof(colorBuffer[1]);
+    snake.color.b = stof(colorBuffer[2]);
+    snake.color.a = 255;
     colorBuffer = Split(settingsList[6].substr(12), ',');
-    for (int i = 0; i < 3; i++)
-        appleColor[i] = stof(colorBuffer[i]);
+    appleColor.r = stoi(colorBuffer[0]);
+    appleColor.g = stoi(colorBuffer[1]);
+    appleColor.b = stoi(colorBuffer[2]);
+    appleColor.a = 255;
     applesNumber = stoi(settingsList[7].substr(14));
-    noSpeedLimit = (settingsList[8] == "no-speed-limit=true") ? true : false;
-    autoMode = (settingsList[9] == "auto-mode=true") ? true : false;
-    vsync = (settingsList[10] == "vsync=true") ? true : false;
+    noSpeedLimit = settingsList[8] == "no-speed-limit=true";
+    autoMode = settingsList[9] == "auto-mode=true";
+    vsync = settingsList[10] == "vsync=true";
 }

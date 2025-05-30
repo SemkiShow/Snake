@@ -1,30 +1,34 @@
 # Snake
 
+A game of Snake made in C++
+
 ## How to run
+
+### Executable
 
 - Download the latest release
 - Unzip it
 - Run main or main.exe depending on your system
 
+<!-- ### [Web version](SemkiShow.github.io/Snake.html) -->
+
 ## How to build
 
-1. Install Git, CMake and SFML 3.0.0+. Use your system's package manager if available.
-1. If you use Linux, install SFML's dependencies using your system package manager. On Ubuntu and other Debian-based distributions you can use the following commands:
-    ```
-    sudo apt update
-    sudo apt install \
-        libxrandr-dev \
-        libxcursor-dev \
-        libudev-dev \
-        libfreetype-dev \
-        libopenal-dev \
-        libflac-dev \
-        libvorbis-dev \
-        libgl1-mesa-dev \
-        libegl1-mesa-dev
-    ```
+### Executable
+
+1. Install Raylib following one of these tutorials based on your system: [Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux), [Windows](https://github.com/raysan5/raylib/wiki/Working-on-Windows), [macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
 1. Run 
 ```
 chmod +x run.sh
 ./run.sh
+```
+
+### Web version
+
+1. Install Raylib following one of these tutorials based on your system: [Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux), [Windows](https://github.com/raysan5/raylib/wiki/Working-on-Windows), [macOS](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
+1. Setup Emscripten using [this tutorial](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5))
+1. Run
+```
+chmod +x run.sh
+./run.sh --web
 ```
