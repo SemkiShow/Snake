@@ -266,10 +266,10 @@ void DrawFrame()
             PauseMusicStream(funMusic);
             ResumeMusicStream(bgMusic);
         }
-
-        // Update data fom settings
-        UpdateSettings();
     }
+    
+    // Update data fom settings
+    UpdateSettings();
 
     DrawSprites();
     DrawUI();
