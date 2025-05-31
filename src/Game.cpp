@@ -4,6 +4,7 @@
 
 unsigned int windowSize[2]{16*50*2, 9*50*2};
 unsigned int horizontalCellsNumber = 50;
+#define SNAKE_BORDER_SIZE 5
 
 Music bgMusic;
 Music funMusic;
@@ -174,15 +175,17 @@ void DrawSprites()
 
     // Draw the snake
     for (int i = 0; i < snake.body.size(); i++)
-        DrawRectangle((snake.body[i] % horizontalCellsNumber) * scale * 1.f, 
-            (snake.body[i] / horizontalCellsNumber) * scale * 1.f,
-            scale * 1.f, scale * 1.f, snake.color);
+        DrawRectangle((snake.body[i] % horizontalCellsNumber) * scale * (GetScreenWidth() * 1.f / windowSize[0]) + SNAKE_BORDER_SIZE, 
+            (snake.body[i] / horizontalCellsNumber) * scale * (GetScreenHeight() * 1.f / windowSize[1]) + SNAKE_BORDER_SIZE,
+            scale * (GetScreenWidth() * 1.f / windowSize[0]) - SNAKE_BORDER_SIZE, 
+            scale * (GetScreenHeight() * 1.f / windowSize[1]) - SNAKE_BORDER_SIZE, snake.color);
 
     // Draw the apples
     for (int i = 0; i < apples.size(); i++)
-        DrawRectangle((apples[i].position % horizontalCellsNumber) * scale * 1.f, 
-            (apples[i].position / horizontalCellsNumber) * scale * 1.f,
-            scale * 1.f, scale * 1.f, apples[i].color);
+        DrawRectangle((apples[i].position % horizontalCellsNumber) * scale * (GetScreenWidth() * 1.f / windowSize[0]) + SNAKE_BORDER_SIZE, 
+            (apples[i].position / horizontalCellsNumber) * scale * (GetScreenHeight() * 1.f / windowSize[1]) + SNAKE_BORDER_SIZE,
+            scale * (GetScreenWidth() * 1.f / windowSize[0]) - SNAKE_BORDER_SIZE, 
+            scale * (GetScreenHeight() * 1.f / windowSize[1]) - SNAKE_BORDER_SIZE, apples[i].color);
 }
 
 void DrawFrame()
