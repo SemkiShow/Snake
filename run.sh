@@ -24,7 +24,11 @@ fi
 if [ "$1" == "-w" ] || [ "$1" == "--web" ]; then
     clear
     ./reset_save_files.sh --soft
-    emcmake cmake -B build_web -DPLATFORM=Web
+    if [ "$2" == "-m" ] || [ "$2" == "--minimal" ]; then
+        emcmake cmake -B build_web -DPLATFORM=Web -DSHELL=Minimal
+    else
+        emcmake cmake -B build_web -DPLATFORM=Web -DSHELL=Full
+    fi
     cmake --build build_web -j ${nproc}
     emrun ./build_web/bin/main.html
 fi
@@ -38,4 +42,5 @@ if [ "$1" == "--help" ]; then
     echo ""
     echo "-d, --debug    Compile the debug build and run it with gdb"
     echo "-w, --web      Compile the WebAssembly build"
+    echo "-m, --minimal  Compile a WebAssembly build with the minimal shell"
 fi

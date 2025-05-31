@@ -10,7 +10,7 @@ A game of Snake made in C++
 - Unzip it
 - Run main or main.exe depending on your system
 
-<!-- ### [Web version](SemkiShow.github.io/Snake.html) -->
+### [Web version](https://semkishow.github.io/Snake/main.html)
 
 ## How to build
 

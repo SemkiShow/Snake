@@ -54,9 +54,12 @@ if ("${PLATFORM}" STREQUAL "Web")
         "-sUSE_GLFW=3"
         "-sEXPORTED_RUNTIME_METHODS=['HEAPF32']"
         "--preload-file" "${CMAKE_SOURCE_DIR}/resources@resources"
-        # "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html"
     )
+    if ("${SHELL}" STREQUAL "Minimal")
+        target_link_options(main PUBLIC "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html")
+    endif()
 endif()
+
 
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)
 if (APPLE)
