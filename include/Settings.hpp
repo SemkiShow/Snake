@@ -16,6 +16,7 @@ extern float applesNumberFloat;
 extern bool noSpeedLimit;
 extern bool autoMode;
 extern bool vsync;
+extern float audioVolume;
 
 void Save(std::string fileName);
 void Load(std::string fileName);

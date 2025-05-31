@@ -14,6 +14,7 @@ float applesNumberFloat = applesNumber;
 bool noSpeedLimit = false;
 bool autoMode = false;
 bool vsync = true;
+float audioVolume = 0.5f;
 
 std::vector<std::string> Split(std::string input, char delimiter)
 {
@@ -49,6 +50,7 @@ void Save(std::string fileName)
     settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
     settingsFile << "auto-mode=" << (autoMode ? "true" : "false") << "\n";
     settingsFile << "vsync=" << (vsync ? "true" : "false") << "\n";
+    settingsFile << "audio-volume=" << audioVolume << '\n';
     settingsFile.close();
 }
 
@@ -86,4 +88,5 @@ void Load(std::string fileName)
     noSpeedLimit = settingsList[8] == "no-speed-limit=true";
     autoMode = settingsList[9] == "auto-mode=true";
     vsync = settingsList[10] == "vsync=true";
+    audioVolume = stof(settingsList[11].substr(13));
 }

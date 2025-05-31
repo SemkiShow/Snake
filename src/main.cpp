@@ -28,7 +28,7 @@ int main()
     SetExitKey(-1);
     InitAudioDevice();
     SetAudioStreamBufferSizeDefault(8192);
-    SetMasterVolume(0.5f);
+    SetMasterVolume(audioVolume);
 
     GuiSetFont(GetFontDefault());
     

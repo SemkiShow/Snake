@@ -26,6 +26,8 @@ void DrawSettings(bool* isOpen)
     GuiCheckBox(Rectangle{60, 520, 30, 30}, "no-speed-limit", &noSpeedLimit);
     GuiCheckBox(Rectangle{60, 560, 30, 30}, "auto-mode", &autoMode);
     GuiCheckBox(Rectangle{60, 600, 30, 30}, "vsync", &vsync);
+    GuiSlider(Rectangle{60, 640, (float)GetScreenWidth() - 250, 30}, "", "audio-volume", &audioVolume, 0, 2);
+    DrawText(std::to_string(audioVolume).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 645, 24, WHITE);
 }
 
 void DrawUI()

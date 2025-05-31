@@ -28,6 +28,7 @@ float lastApplesNumber = applesNumberFloat;
 bool lastAutoMode = autoMode;
 bool lastVsync = vsync;
 Color lastAppleColor;
+float lastAudioVolume = audioVolume;
 
 void Restart()
 {
@@ -157,6 +158,11 @@ void UpdateSettings()
         lastAppleColor = appleColor;
         for (int i = 0; i < apples.size(); i++)
             apples[i].color = appleColor;
+    }
+    if (lastAudioVolume != audioVolume)
+    {
+        lastAudioVolume = audioVolume;
+        SetMasterVolume(audioVolume);
     }
 }
 
