@@ -71,10 +71,10 @@ void Snake::CheckWallCollision()
 {
     for (int i = body.size()-1; i < body.size(); i++)
     {
-        if (body[i] < 0)
-            body[i] += horizontalCellsNumber * (windowSize[1] / scale);
-        else if (body[i] >= horizontalCellsNumber * (windowSize[1] / scale))
-            body[i] -= horizontalCellsNumber * (windowSize[1] / scale);
+        if (body[i] < 0 && direction == 'U')
+            body[i] += horizontalCellsNumber * windowSize[1] / scale;
+        else if (body[i] >= horizontalCellsNumber * windowSize[1] / scale && direction == 'D')
+            body[i] -= horizontalCellsNumber * windowSize[1] / scale;
         else if ((body[i]+1) % horizontalCellsNumber == 0 && direction == 'L')
             body[i] += horizontalCellsNumber;
         else if (body[i] % horizontalCellsNumber == 0 && direction == 'R')
