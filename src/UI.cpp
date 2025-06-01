@@ -45,7 +45,9 @@ void DrawColorPicker(char* text, Color* color)
 void DrawSettings(bool* isOpen)
 {
     if (!*isOpen) return;
-    DrawRectangleRounded(Rectangle{30, 30, (float)GetScreenWidth() - 60, (float)GetScreenHeight() - 60}, 0.1f, 1, Color{128, 128, 128, 128});
+    DrawRectangleRounded(
+        Rectangle{UI_SPACING, UI_SPACING, (float)GetScreenWidth() - UI_SPACING*2, (float)GetScreenHeight() - UI_SPACING*2}, 
+        0.1f, 1, Color{128, 128, 128, 128});
     nextElementPositionY = UI_SPACING * 2;
     DrawCheckBox("fun-mode", &funMode);
     DrawSliderInt("", "fun-mode-level", &funModeLevel, 0, 100);
