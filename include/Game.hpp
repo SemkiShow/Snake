@@ -49,6 +49,7 @@ class Snake
 };
 extern Snake snake;
 
+void GenerateApple();
 void Restart();
 void ProcessPlayerInput();
 std::string GenerateAutoModeKeypresses();

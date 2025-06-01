@@ -13,37 +13,8 @@ void Snake::CheckAppleCollision()
             if (body[j] == apples[i].position)
             {
                 body.insert(body.begin(), lastTailPosition);
-                int newApplePosition = 0;
-                bool loop = body.size() + apples.size() - 1 < windowSize[0] / scale * windowSize[1] / scale;
-                if (loop)
-                {
-                    while (loop)
-                    {
-                        loop = false;
-                        newApplePosition = rand() % (windowSize[0] / scale * windowSize[1] / scale);
-                        for (int k = 0; k < body.size(); k++)
-                        {
-                            if (body[k] == newApplePosition)
-                            {
-                                loop = true;
-                                break;
-                            }
-                        }
-                        for (int k = 0; k < apples.size(); k++)
-                        {
-                            if (apples[k].position == newApplePosition)
-                            {
-                                loop = true;
-                                break;
-                            }
-                        }
-                    }
-                    apples[i].position = newApplePosition;
-                }
-                else
-                {
-                    apples.erase(apples.begin() + i);
-                }
+                apples.erase(apples.begin() + i);
+                GenerateApple();
                 if (body.size() >= windowSize[0] / scale * windowSize[1] / scale)
                 {
                     scores.push_back(body.size());

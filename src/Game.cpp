@@ -31,6 +31,38 @@ bool lastVsync = vsync;
 Color lastAppleColor;
 float lastAudioVolume = audioVolume;
 
+void GenerateApple()
+{
+    int newApplePosition = 0;
+    bool loop = snake.body.size() + apples.size() < windowSize[0] / scale * windowSize[1] / scale;
+    if (!loop) return;
+    while (loop)
+    {
+        loop = false;
+        newApplePosition = rand() % (windowSize[0] / scale * windowSize[1] / scale);
+        for (int k = 0; k < snake.body.size(); k++)
+        {
+            if (snake.body[k] == newApplePosition)
+            {
+                loop = true;
+                break;
+            }
+        }
+        if (loop) continue;
+        for (int k = 0; k < apples.size(); k++)
+        {
+            if (apples[k].position == newApplePosition)
+            {
+                loop = true;
+                break;
+            }
+        }
+    }
+    apples.push_back(Apple());
+    apples[apples.size()-1].position = newApplePosition;
+    apples[apples.size()-1].color = appleColor;
+}
+
 void Restart()
 {
     snake.body.clear();
@@ -45,11 +77,7 @@ void Restart()
 
     apples.clear();
     for (int i = 0; i < applesNumber; i++)
-    {
-        apples.push_back(Apple());
-        apples[i].position = rand() % (windowSize[0] / scale * windowSize[1] / scale);
-        apples[i].color = appleColor;
-    }
+        GenerateApple();
     
     isGameOver = false;
     isPaused = false;
@@ -129,13 +157,12 @@ void UpdateSettings()
     if (lastApplesNumber != applesNumberFloat)
     {
         lastApplesNumber = applesNumberFloat;
-        applesNumber = applesNumberFloat;
-        apples.clear();
-        for (int i = 0; i < applesNumber; i++)
+        if ((int)applesNumberFloat != applesNumber)
         {
-            apples.push_back(Apple());
-            apples[i].position = rand() % (windowSize[0] / scale * windowSize[1] / scale);
-            apples[i].color = appleColor;
+            applesNumber = applesNumberFloat;
+            apples.clear();
+            for (int i = 0; i < applesNumber; i++)
+                GenerateApple();
         }
     }
     if (lastScale != scaleFloat || lastApplesNumber != applesNumberFloat || lastAutoMode != autoMode)
