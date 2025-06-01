@@ -80,6 +80,7 @@ void Restart()
     
     isGameOver = false;
     isPaused = false;
+    isHighscore = false;
 
     StopMusicStream(pauseMusic);
     StopMusicStream(funMusic);
