@@ -3,31 +3,60 @@
 #include "Settings.hpp"
 #include "Game.hpp"
 
+#define UI_SPACING 30
+#define ELEMENT_SIZE 30
+#define SLIDER_WIDTH (float)GetScreenWidth() - 270
+#define COLOR_PICKER_SIZE 100
+#define ELEMENT_SPACING 10
+
 bool isPaused = false;
 bool isSettings = false;
+
+int nextElementPositionY = UI_SPACING * 2;
+
+void DrawCheckBox(char* text, bool* value)
+{
+    GuiCheckBox(Rectangle{UI_SPACING * 2, nextElementPositionY, ELEMENT_SIZE, ELEMENT_SIZE}, text, value);
+    nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
+}
+
+void DrawSlider(char* leftText, char* rightText, float* value, float minValue, float maxValue)
+{
+    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, value, minValue, maxValue);
+    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
+    nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
+}
+
+void DrawSliderInt(char* leftText, char* rightText, float* value, float minValue, float maxValue)
+{
+    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, value, minValue, maxValue);
+    DrawText(std::to_string((int)*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
+    nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
+}
+
+void DrawColorPicker(char* text, Color* color)
+{
+    GuiColorPanel(Rectangle{UI_SPACING * 2, nextElementPositionY, COLOR_PICKER_SIZE, COLOR_PICKER_SIZE}, text, color);
+    nextElementPositionY += COLOR_PICKER_SIZE + ELEMENT_SPACING;
+}
 
 void DrawSettings(bool* isOpen)
 {
     if (!*isOpen) return;
     DrawRectangleRounded(Rectangle{30, 30, (float)GetScreenWidth() - 60, (float)GetScreenHeight() - 60}, 0.1f, 1, Color{128, 128, 128, 128});
-    GuiCheckBox(Rectangle{60, 60, 30, 30}, "fun-mode", &funMode);
-    GuiSlider(Rectangle{60, 100, (float)GetScreenWidth() - 250, 30}, "", "fun-mode-level", &funModeLevelFloat, 0, 100);
-    DrawText(std::to_string(funModeLevel).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 105, 24, WHITE);
-    GuiSlider(Rectangle{60, 140, (float)GetScreenWidth() - 250, 30}, "", "speed", &snake.speed, 0.1f, 100);
-    DrawText(std::to_string(snake.speed).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 145, 24, WHITE);
-    GuiSlider(Rectangle{60, 180, (float)GetScreenWidth() - 250, 30}, "", "max-speed", &snake.maxSpeed, 1, 100);
-    DrawText(std::to_string(snake.maxSpeed).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 185, 24, WHITE);
-    GuiSlider(Rectangle{60, 220, (float)GetScreenWidth() - 250, 30}, "", "scale", &scaleFloat, 5, 100);
-    DrawText(std::to_string(scale).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 225, 24, WHITE);
-    GuiColorPicker(Rectangle{60, 260, 100, 100}, "snake-color", &snake.color);
-    GuiColorPicker(Rectangle{60, 370, 100, 100}, "apple-color", &appleColor);
-    GuiSlider(Rectangle{60, 480, (float)GetScreenWidth() - 250, 30}, "", "apples-number", &applesNumberFloat, 1, 50);
-    DrawText(std::to_string(applesNumber).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 485, 24, WHITE);
-    GuiCheckBox(Rectangle{60, 520, 30, 30}, "no-speed-limit", &noSpeedLimit);
-    GuiCheckBox(Rectangle{60, 560, 30, 30}, "auto-mode", &autoMode);
-    GuiCheckBox(Rectangle{60, 600, 30, 30}, "vsync", &vsync);
-    GuiSlider(Rectangle{60, 640, (float)GetScreenWidth() - 250, 30}, "", "audio-volume", &audioVolume, 0, 2);
-    DrawText(std::to_string(audioVolume).c_str(), (GetScreenWidth() - 250 + 60) / 2.f, 645, 24, WHITE);
+    nextElementPositionY = UI_SPACING * 2;
+    DrawCheckBox("fun-mode", &funMode);
+    DrawSliderInt("", "fun-mode-level", &funModeLevelFloat, 0, 100);
+    DrawSlider("", "speed", &snake.speed, 0.1f, 100);
+    DrawSlider("", "max-speed", &snake.maxSpeed, 1, 100);
+    DrawSliderInt("", "scale", &scaleFloat, 5, 100);
+    DrawColorPicker("snake-color", &snake.color);
+    DrawColorPicker("apple-color", &appleColor);
+    DrawSliderInt("", "apples-number", &applesNumberFloat, 1, 50);
+    DrawCheckBox("no-speed-limit", &noSpeedLimit);
+    DrawCheckBox("auto-mode", &autoMode);
+    DrawCheckBox("vsync", &vsync);
+    DrawSlider("", "audio-volume", &audioVolume, 0, 2);
 }
 
 void DrawUI()
