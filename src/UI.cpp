@@ -27,10 +27,12 @@ void DrawSlider(char* leftText, char* rightText, float* value, float minValue, f
     nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
 }
 
-void DrawSliderInt(char* leftText, char* rightText, float* value, float minValue, float maxValue)
+void DrawSliderInt(char* leftText, char* rightText, int* value, float minValue, float maxValue)
 {
-    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, value, minValue, maxValue);
-    DrawText(std::to_string((int)*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
+    float valueFloat = *value;
+    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, &valueFloat, minValue, maxValue);
+    *value = valueFloat;
+    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
     nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
 }
 
@@ -46,13 +48,13 @@ void DrawSettings(bool* isOpen)
     DrawRectangleRounded(Rectangle{30, 30, (float)GetScreenWidth() - 60, (float)GetScreenHeight() - 60}, 0.1f, 1, Color{128, 128, 128, 128});
     nextElementPositionY = UI_SPACING * 2;
     DrawCheckBox("fun-mode", &funMode);
-    DrawSliderInt("", "fun-mode-level", &funModeLevelFloat, 0, 100);
+    DrawSliderInt("", "fun-mode-level", &funModeLevel, 0, 100);
     DrawSlider("", "speed", &snake.speed, 0.1f, 100);
     DrawSlider("", "max-speed", &snake.maxSpeed, 1, 100);
-    DrawSliderInt("", "scale", &scaleFloat, 5, 100);
+    DrawSliderInt("", "scale", &scale, 5, 100);
     DrawColorPicker("snake-color", &snake.color);
     DrawColorPicker("apple-color", &appleColor);
-    DrawSliderInt("", "apples-number", &applesNumberFloat, 1, 50);
+    DrawSliderInt("", "apples-number", &applesNumber, 1, 50);
     DrawCheckBox("no-speed-limit", &noSpeedLimit);
     DrawCheckBox("auto-mode", &autoMode);
     DrawCheckBox("vsync", &vsync);

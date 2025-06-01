@@ -3,14 +3,11 @@
 
 bool funMode = false;
 int funModeLevel = 5;
-float funModeLevelFloat = funModeLevel;
 float speed = 2;
 float maxSpeed = 20;
 int scale = 32;
-float scaleFloat = scale;
 Color appleColor = Color{255, 0, 0, 255};
 int applesNumber = 1;
-float applesNumberFloat = applesNumber;
 bool noSpeedLimit = false;
 bool autoMode = false;
 bool vsync = true;
@@ -52,6 +49,16 @@ void Save(std::string fileName)
     settingsFile << "vsync=" << (vsync ? "true" : "false") << "\n";
     settingsFile << "audio-volume=" << audioVolume << '\n';
     settingsFile.close();
+
+    // Save score
+    std::fstream scoreListFile;
+    scoreListFile.open("score.txt", std::ios::out);
+    for (int k = 0; k < scores.size(); k++)
+    {
+        scoreListFile << scores[k];
+        if (k != scores.size()-1) scoreListFile << "\n";
+    }
+    scoreListFile.close();
 }
 
 void Load(std::string fileName)
@@ -68,11 +75,9 @@ void Load(std::string fileName)
     // Process the file
     funMode = settingsList[0] == "fun-mode=true";
     funModeLevel = stoi(settingsList[1].substr(15));
-    funModeLevelFloat = funModeLevel;
     snake.speed = stof(settingsList[2].substr(6));
     snake.maxSpeed = stof(settingsList[3].substr(10));
     scale = stoi(settingsList[4].substr(6));
-    scaleFloat = scale;
     std::vector<std::string> colorBuffer = Split(settingsList[5].substr(12), ',');
     snake.color.r = stoi(colorBuffer[0]);
     snake.color.g = stof(colorBuffer[1]);
@@ -84,9 +89,15 @@ void Load(std::string fileName)
     appleColor.b = stoi(colorBuffer[2]);
     appleColor.a = 255;
     applesNumber = stoi(settingsList[7].substr(14));
-    applesNumberFloat = applesNumber;
     noSpeedLimit = settingsList[8] == "no-speed-limit=true";
     autoMode = settingsList[9] == "auto-mode=true";
     vsync = settingsList[10] == "vsync=true";
     audioVolume = stof(settingsList[11].substr(13));
+
+    // Load scores
+    std::fstream scoreListFile;
+    scoreListFile.open("score.txt", std::ios::in);
+    while (std::getline(scoreListFile, buf))
+        scores.push_back(stoi(buf));
+    scoreListFile.close();
 }

@@ -23,9 +23,8 @@ std::vector<Apple> apples;
 
 double delayClock;
 char lastKeyPress = 'R';
-float lastFunModeLevel = funModeLevelFloat;
-float lastScale = scaleFloat;
-float lastApplesNumber = applesNumberFloat;
+int lastScale = scale;
+int lastApplesNumber = applesNumber;
 bool lastAutoMode = autoMode;
 bool lastVsync = vsync;
 Color lastAppleColor;
@@ -82,18 +81,6 @@ void Restart()
     isGameOver = false;
     isPaused = false;
 
-    scores.clear();
-    #if !defined(PLATFORM_WEB)
-    std::fstream scoreListFile;
-    scoreListFile.open("score.txt", std::ios::in);
-    std::string buf;
-    while (std::getline(scoreListFile, buf))
-        scores.push_back(stoi(buf));
-    scoreListFile.close();
-    #else
-    scores.push_back(3);
-    #endif
-
     StopMusicStream(pauseMusic);
     StopMusicStream(funMusic);
     PlayMusicStream(bgMusic);
@@ -149,29 +136,18 @@ std::string GenerateAutoModeKeypresses()
 
 void UpdateSettings()
 {
-    if (lastFunModeLevel != funModeLevelFloat)
+    if (lastApplesNumber != applesNumber)
     {
-        lastFunModeLevel = funModeLevelFloat;
-        funModeLevel = funModeLevelFloat;
+        lastApplesNumber = applesNumber;
+        apples.clear();
+        for (int i = 0; i < applesNumber; i++)
+            GenerateApple();
     }
-    if (lastApplesNumber != applesNumberFloat)
+    if (lastScale != scale || lastApplesNumber != applesNumber || lastAutoMode != autoMode)
     {
-        lastApplesNumber = applesNumberFloat;
-        if ((int)applesNumberFloat != applesNumber)
-        {
-            applesNumber = applesNumberFloat;
-            apples.clear();
-            for (int i = 0; i < applesNumber; i++)
-                GenerateApple();
-        }
-    }
-    if (lastScale != scaleFloat || lastApplesNumber != applesNumberFloat || lastAutoMode != autoMode)
-    {
-        lastScale = scaleFloat;
-        scale = scaleFloat;
+        lastScale = scale;
         horizontalCellsNumber = floor(windowSize[0] / scale);
-        lastApplesNumber = applesNumberFloat;
-        applesNumber = applesNumberFloat;
+        lastApplesNumber = applesNumber;
         lastAutoMode = autoMode;
         Restart();
     }

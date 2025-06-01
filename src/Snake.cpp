@@ -65,14 +65,6 @@ void Snake::CheckSelfCollision()
                     PlaySound(gameOverSound);
                 scores.push_back(body.size());
                 std::sort(scores.begin(), scores.end());
-                std::fstream scoreListFile;
-                scoreListFile.open("score.txt", std::ios::out);
-                for (int k = 0; k < scores.size(); k++)
-                {
-                    scoreListFile << scores[k];
-                    if (k != scores.size()-1) scoreListFile << "\n";
-                }
-                scoreListFile.close();
                 if (body.size() >= scores[scores.size()-1]) isHighscore = true;
                 isGameOver = true;
             }

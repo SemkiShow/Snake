@@ -13,6 +13,8 @@ int main()
     srand(time(0));
     #if !defined(PLATFORM_WEB)
     Load("settings.txt");
+    #else
+    scores.push_back(3);
     #endif
 
     int flags = 0;
