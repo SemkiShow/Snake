@@ -39,8 +39,8 @@ int main()
     funMusic = LoadMusicStream("resources/fun-bg.ogg");
     SetMusicVolume(funMusic, 2);
     pauseMusic = LoadMusicStream("resources/pause-music.ogg");
-    pickupSound = LoadSound("resources/pickup.wav");
-    gameOverSound = LoadSound("resources/game-over.wav");
+    pickupSound = LoadSound("resources/pickup.ogg");
+    gameOverSound = LoadSound("resources/game-over.ogg");
     Image image = LoadImage("resources/fun-bg.jpg");
     funTexture = LoadTextureFromImage(image);
     image = LoadImage("resources/fun-bg-gameover.jpg");
