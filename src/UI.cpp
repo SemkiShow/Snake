@@ -66,7 +66,7 @@ void DrawSettings(bool* isOpen)
 void DrawUI()
 {
 
-    if (isGameOver && mode == "china") StopMusicStream(funMusic); 
+    if (isGameOver && mode == "fun") StopMusicStream(funMusic); 
     if (isGameOver && mode == "normal" && snake.body.size() < horizontalCellsNumber * windowSize[1] / scale)
     {
         StopMusicStream(bgMusic);

@@ -34,16 +34,16 @@ int main()
 
     GuiSetFont(GetFontDefault());
     
-    bgMusic = LoadMusicStream("resources/snake-bg.wav");
+    bgMusic = LoadMusicStream("resources/snake-bg.ogg");
     PlayMusicStream(bgMusic);
-    funMusic = LoadMusicStream("resources/china-bg.wav");
+    funMusic = LoadMusicStream("resources/fun-bg.ogg");
     SetMusicVolume(funMusic, 2);
-    pauseMusic = LoadMusicStream("resources/pause-music.wav");
+    pauseMusic = LoadMusicStream("resources/pause-music.ogg");
     pickupSound = LoadSound("resources/pickup.wav");
     gameOverSound = LoadSound("resources/game-over.wav");
-    Image image = LoadImage("resources/china-bg.jpg");
+    Image image = LoadImage("resources/fun-bg.jpg");
     funTexture = LoadTextureFromImage(image);
-    image = LoadImage("resources/china-bg-gameover.jpg");
+    image = LoadImage("resources/fun-bg-gameover.jpg");
     funGameOverTexture = LoadTextureFromImage(image);
     UnloadImage(image);
     Restart();

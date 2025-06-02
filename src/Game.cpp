@@ -173,8 +173,8 @@ void UpdateSettings()
 
 void DrawSprites()
 {
-    // Print the background if it's china mode
-    if (mode == "china")
+    // Print the background if it's fun mode
+    if (mode == "fun")
         DrawTextureEx(isGameOver ? funGameOverTexture : funTexture, Vector2{0, 0}, 0, (float)GetScreenHeight() / funTexture.height, WHITE);
 
     // Draw the snake
@@ -257,10 +257,10 @@ void DrawFrame()
         // Check self-collision
         snake.CheckSelfCollision();
     
-        // China mode check
-        if (snake.body.size() >= funModeLevel && mode != "china" && funMode == true)
+        // fun mode check
+        if (snake.body.size() >= funModeLevel && mode != "fun" && funMode == true)
         {
-            mode = "china";
+            mode = "fun";
             PauseMusicStream(bgMusic);
             ResumeMusicStream(funMusic);
         }
@@ -279,7 +279,7 @@ void DrawFrame()
     DrawUI();
 
     if (mode == "normal" && !isPaused) UpdateMusicStream(bgMusic);
-    if (mode == "china" && !isPaused) UpdateMusicStream(funMusic);
+    if (mode == "fun" && !isPaused) UpdateMusicStream(funMusic);
     if (isPaused) UpdateMusicStream(pauseMusic);
     if (!IsMusicStreamPlaying(bgMusic)) PlayMusicStream(bgMusic);
     if (!IsMusicStreamPlaying(funMusic)) PlayMusicStream(funMusic);
