@@ -12,7 +12,7 @@
 bool isPaused = false;
 bool isSettings = false;
 
-int nextElementPositionY = UI_SPACING * 2;
+float nextElementPositionY = UI_SPACING * 2;
 
 void DrawCheckBox(char* text, bool* value)
 {
