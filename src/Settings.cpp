@@ -66,33 +66,40 @@ void Load(std::string fileName)
     // Read the file
     std::fstream settingsFile;
     settingsFile.open(fileName, std::ios::in);
-    std::vector<std::string> settingsList;
-    std::string buf;
+    std::string buf, label, value;
     while (std::getline(settingsFile, buf))
-        settingsList.push_back(buf);
-    settingsFile.close();
+    {
+        label = Split(buf, '=')[0];
+        value = Split(buf, '=')[1];
 
-    // Process the file
-    funMode = settingsList[0] == "fun-mode=true";
-    funModeLevel = stoi(settingsList[1].substr(15));
-    snake.speed = stof(settingsList[2].substr(6));
-    snake.maxSpeed = stof(settingsList[3].substr(10));
-    scale = stoi(settingsList[4].substr(6));
-    std::vector<std::string> colorBuffer = Split(settingsList[5].substr(12), ',');
-    snake.color.r = stoi(colorBuffer[0]);
-    snake.color.g = stof(colorBuffer[1]);
-    snake.color.b = stof(colorBuffer[2]);
-    snake.color.a = 255;
-    colorBuffer = Split(settingsList[6].substr(12), ',');
-    appleColor.r = stoi(colorBuffer[0]);
-    appleColor.g = stoi(colorBuffer[1]);
-    appleColor.b = stoi(colorBuffer[2]);
-    appleColor.a = 255;
-    applesNumber = stoi(settingsList[7].substr(14));
-    noSpeedLimit = settingsList[8] == "no-speed-limit=true";
-    autoMode = settingsList[9] == "auto-mode=true";
-    vsync = settingsList[10] == "vsync=true";
-    audioVolume = stof(settingsList[11].substr(13));
+        if (label == "fun-mode") funMode = value == "true";
+        if (label == "fun-mode-level") funModeLevel = stoi(value);
+        if (label == "speed") snake.speed = stof(settingsList[2].substr(6));
+        if (label == "max-speed") snake.maxSpeed = stof(settingsList[3].substr(10));
+        if (label == "scale") scale = stoi(settingsList[4].substr(6));
+        if (label == "snake-color")
+        {
+            std::vector<std::string> colorBuffer = Split(value, ',');
+            snake.color.r = stoi(colorBuffer[0]);
+            snake.color.g = stof(colorBuffer[1]);
+            snake.color.b = stof(colorBuffer[2]);
+            snake.color.a = 255;
+        }
+        if (label == "apple-color")
+        {
+            std::vector<std::string> colorBuffer = Split(value, ',');
+            appleColor.r = stoi(colorBuffer[0]);
+            appleColor.g = stoi(colorBuffer[1]);
+            appleColor.b = stoi(colorBuffer[2]);
+            appleColor.a = 255;
+        }
+        if (label == "apples-number") applesNumber = stoi(value);
+        if (label == "no-speed-limit") noSpeedLimit = value == "true";
+        if (label == "auto-mode") autoMode = value == "true";
+        if (label == "vsync") vsync = value == "true";
+        if (label == "audio-volume") audioVolume = stof(value);
+    }
+    settingsFile.close();
 
     // Load scores
     std::fstream scoreListFile;
