@@ -11,11 +11,7 @@
 int main()
 {
     srand(time(0));
-    #if !defined(PLATFORM_WEB)
     Load("settings.txt");
-    #else
-    scores.push_back(3);
-    #endif
 
     int flags = 0;
     if (vsync) flags |= FLAG_VSYNC_HINT;
@@ -48,20 +44,14 @@ int main()
     UnloadImage(image);
     Restart();
 
-    #if defined(PLATFORM_WEB)
-        emscripten_set_main_loop(DrawFrame, 0, 1);
-    #else
-        while (!WindowShouldClose())
-        {
-            DrawFrame();
-        }
-    #endif
+    while (!WindowShouldClose())
+    {
+        DrawFrame();
+    }
 
     CleanUp();
 
-    #if !defined(PLATFORM_WEB)
     Save("settings.txt");
-	#endif
     CloseWindow();
 
     return 0;

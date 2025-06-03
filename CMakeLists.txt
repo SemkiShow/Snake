@@ -51,9 +51,12 @@ if ("${PLATFORM}" STREQUAL "Web")
         "-sASSERTIONS=1"
         "-sFORCE_FILESYSTEM"
         "-sALLOW_MEMORY_GROWTH"
+        "-sASYNCIFY"
         "-sUSE_GLFW=3"
         "-sEXPORTED_RUNTIME_METHODS=['HEAPF32']"
         "--preload-file" "${CMAKE_SOURCE_DIR}/resources@resources"
+        "--preload-file=${CMAKE_SOURCE_DIR}/settings.txt@settings.txt"
+        "--preload-file=${CMAKE_SOURCE_DIR}/score.txt@score.txt"
     )
     if ("${SHELL}" STREQUAL "Minimal")
         target_link_options(main PUBLIC "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html")
