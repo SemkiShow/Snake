@@ -74,9 +74,9 @@ void Load(std::string fileName)
 
         if (label == "fun-mode") funMode = value == "true";
         if (label == "fun-mode-level") funModeLevel = stoi(value);
-        if (label == "speed") snake.speed = stof(settingsList[2].substr(6));
-        if (label == "max-speed") snake.maxSpeed = stof(settingsList[3].substr(10));
-        if (label == "scale") scale = stoi(settingsList[4].substr(6));
+        if (label == "speed") snake.speed = stof(value);
+        if (label == "max-speed") snake.maxSpeed = stof(value);
+        if (label == "scale") scale = stoi(value);
         if (label == "snake-color")
         {
             std::vector<std::string> colorBuffer = Split(value, ',');
