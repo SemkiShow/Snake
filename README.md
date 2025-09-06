@@ -1,5 +1,11 @@
 # Snake
 
+<p float="left">
+  <img src="resources/screenshots/Snake1.png" width="300" />
+  <img src="resources/screenshots/Snake2.png" width="300" />
+  <img src="resources/screenshots/Snake3.png" width="300" />
+</p>
+
 A game of Snake made in C++
 
 ## How to run
