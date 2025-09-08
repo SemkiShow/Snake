@@ -11,9 +11,6 @@ include(FetchContent)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Set the default build type to Release
-set(CMAKE_BUILD_TYPE Release)
-
 # Dependencies
 set(RAYLIB_VERSION 5.5)
 set(RAYGUI_VERSION 4.0)
@@ -45,8 +42,7 @@ target_link_libraries(main raylib raygui)
 
 # Web Configurations
 if ("${PLATFORM}" STREQUAL "Web")
-    # Tell Emscripten to build an example.html file.
-    set_target_properties(main PROPERTIES SUFFIX ".html")
+    set_target_properties(main PROPERTIES OUTPUT_NAME "index" SUFFIX ".html")
     target_link_options(main PUBLIC 
         "-sASSERTIONS=1"
         "-sFORCE_FILESYSTEM"

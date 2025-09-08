@@ -6,7 +6,7 @@ set -e
 if [ "$1" == "" ]; then
     clear
     ./reset_save_files.sh --soft
-    cmake -B build
+    cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
     cmake --build build -j ${nproc}
     ./build/bin/main
 fi
@@ -30,7 +30,7 @@ if [ "$1" == "-w" ] || [ "$1" == "--web" ]; then
         emcmake cmake -B build_web -DPLATFORM=Web -DSHELL=Full
     fi
     cmake --build build_web -j ${nproc}
-    emrun ./build_web/bin/main.html
+    emrun ./build_web/bin/
 fi
 
 # Help info

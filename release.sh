@@ -3,12 +3,12 @@
 set -e
 
 # Compiling for Linux
-cmake -B build
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j ${nproc}
 cp build/bin/main main
 
 # Compiling for Windows
-cmake -B build_win --toolchain ../mingw-w64-x86_64.cmake
+cmake -B build_win -DCMAKE_BUILD_TYPE=Release --toolchain ../mingw-w64-x86_64.cmake
 cmake --build build_win -j ${nproc}
 cp build_win/bin/main.exe .
 
