@@ -14,9 +14,9 @@ A game of Snake made in C++
 
 - Download the latest release
 - Unzip it
-- Run main or main.exe depending on your system
+- Run Snake or Snake.exe depending on your system
 
-### [Web version](https://semkishow.github.io/Snake/main.html)
+### [Web version](https://semkishow.github.io/Snake/)
 
 ## How to build
 

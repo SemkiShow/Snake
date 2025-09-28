@@ -1,49 +1,34 @@
 cmake_minimum_required(VERSION 3.28)
-project(SampleRaylibProject)
+project(Snake)
 
 if (UNIX)
     set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Build GLFW Wayland support")
     set(GLFW_BUILD_X11 ON CACHE BOOL "Build GLFW X11 support")
 endif()
 
-include(FetchContent)
-
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Dependencies
-set(RAYLIB_VERSION 5.5)
-set(RAYGUI_VERSION 4.0)
+# Turn off all warning-related errors when compiling third-party code
+add_compile_options(-Wno-error)
 
-FetchContent_Declare(
-    raylib
-    DOWNLOAD_EXTRACT_TIMESTAMP OFF
-    URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
-    FIND_PACKAGE_ARGS
-)
-FetchContent_MakeAvailable(raylib)
+# Raylib
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/raylib ${CMAKE_BINARY_DIR}/_deps/raylib-build)
 
 # Raygui
-FetchContent_Declare(
-    raygui
-    URL https://github.com/raysan5/raygui/archive/refs/tags/${RAYGUI_VERSION}.tar.gz
-)
-FetchContent_MakeAvailable(raygui)
-add_subdirectory(${raygui_SOURCE_DIR}/projects/CMake)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/raygui/projects/CMake ${CMAKE_BINARY_DIR}/_deps/raygui-build)
 
-# Our Project
+add_compile_options(-Wall -Wextra)
 file(GLOB SOURCES src/*.cpp)
-
-add_executable(main ${SOURCES})
-target_include_directories(main PRIVATE include/)
-target_compile_features(main PRIVATE cxx_std_17)
-set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(main raylib raygui)
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE include/)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib raygui)
 
 # Web Configurations
 if ("${PLATFORM}" STREQUAL "Web")
-    set_target_properties(main PROPERTIES OUTPUT_NAME "index" SUFFIX ".html")
-    target_link_options(main PUBLIC 
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "index" SUFFIX ".html")
+    target_link_options(${PROJECT_NAME} PUBLIC 
         "-sASSERTIONS=1"
         "-sFORCE_FILESYSTEM"
         "-sALLOW_MEMORY_GROWTH"
@@ -52,17 +37,15 @@ if ("${PLATFORM}" STREQUAL "Web")
         "-sEXPORTED_RUNTIME_METHODS=['HEAPF32']"
         "--preload-file" "${CMAKE_SOURCE_DIR}/resources@resources"
         "--preload-file=${CMAKE_SOURCE_DIR}/settings.txt@settings.txt"
-        "--preload-file=${CMAKE_SOURCE_DIR}/score.txt@score.txt"
     )
     if ("${SHELL}" STREQUAL "Minimal")
-        target_link_options(main PUBLIC "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html")
+        target_link_options(${PROJECT_NAME} PUBLIC "--shell-file" "${CMAKE_SOURCE_DIR}/src/shell_minimal.html")
     endif()
 endif()
 
-
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)
 if (APPLE)
-    target_link_libraries(main "-framework IOKit")
-    target_link_libraries(main "-framework Cocoa")
-    target_link_libraries(main "-framework OpenGL")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Cocoa")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
 endif()
