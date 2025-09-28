@@ -1,7 +1,7 @@
-#include "raylib.h"
-#include <vector>
+#pragma once
+
+#include <raylib.h>
 #include <string>
-#include <fstream>
 
 extern bool funMode;
 extern int funModeLevel;

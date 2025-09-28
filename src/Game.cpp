@@ -1,8 +1,9 @@
 #include "Game.hpp"
-#include "UI.hpp"
 #include "Settings.hpp"
+#include "UI.hpp"
+#include <cmath>
 
-unsigned int windowSize[2]{16*50*2, 9*50*2};
+Vector2 windowSize{16 * 50 * 2, 9 * 50 * 2};
 unsigned int horizontalCellsNumber = 50;
 #define SNAKE_BORDER_SIZE 5
 
@@ -18,7 +19,7 @@ bool isGameOver = false;
 bool isHighscore = false;
 std::string mode = "normal";
 
-std::vector<int> scores;
+std::vector<size_t> scores;
 std::vector<Apple> apples;
 
 double delayClock;
@@ -32,14 +33,14 @@ float lastAudioVolume = audioVolume;
 
 void GenerateApple()
 {
-    int newApplePosition = 0;
-    bool loop = snake.body.size() + apples.size() < windowSize[0] / scale * windowSize[1] / scale;
+    size_t newApplePosition = 0;
+    bool loop = snake.body.size() + apples.size() < windowSize.x / scale * windowSize.y / scale;
     if (!loop) return;
     while (loop)
     {
         loop = false;
-        newApplePosition = rand() % (windowSize[0] / scale * windowSize[1] / scale);
-        for (int k = 0; k < snake.body.size(); k++)
+        newApplePosition = rand() % int(windowSize.x / scale * windowSize.y / scale);
+        for (size_t k = 0; k < snake.body.size(); k++)
         {
             if (snake.body[k] == newApplePosition)
             {
@@ -48,7 +49,7 @@ void GenerateApple()
             }
         }
         if (loop) continue;
-        for (int k = 0; k < apples.size(); k++)
+        for (size_t k = 0; k < apples.size(); k++)
         {
             if (apples[k].position == newApplePosition)
             {
@@ -58,8 +59,8 @@ void GenerateApple()
         }
     }
     apples.push_back(Apple());
-    apples[apples.size()-1].position = newApplePosition;
-    apples[apples.size()-1].color = appleColor;
+    apples[apples.size() - 1].position = newApplePosition;
+    apples[apples.size() - 1].color = appleColor;
 }
 
 void Restart()
@@ -77,7 +78,7 @@ void Restart()
     apples.clear();
     for (int i = 0; i < applesNumber; i++)
         GenerateApple();
-    
+
     isGameOver = false;
     isPaused = false;
     isHighscore = false;
@@ -114,23 +115,23 @@ void ProcessPlayerInput()
 std::string GenerateAutoModeKeypresses()
 {
     std::string output = "";
-    for (int i = 0; i < horizontalCellsNumber - 3; i++)
+    for (size_t i = 0; i < horizontalCellsNumber - 3; i++)
         output += 'R';
-    for (int i = 0; i < windowSize[1] / scale - 1; i++)
+    for (size_t i = 0; i < windowSize.y / scale - 1; i++)
         output += 'D';
-    for (int i = 0; i < horizontalCellsNumber / 2 - 1; i++)
+    for (size_t i = 0; i < horizontalCellsNumber / 2 - 1; i++)
     {
         output += 'L';
-        for (int j = 0; j < windowSize[1] / scale - 2; j++)
+        for (size_t j = 0; j < windowSize.y / scale - 2; j++)
             output += 'U';
         output += 'L';
-        for (int j = 0; j < windowSize[1] / scale - 2; j++)
+        for (size_t j = 0; j < windowSize.y / scale - 2; j++)
             output += 'D';
     }
     output += 'L';
-    for (int i = 0; i < windowSize[1] / scale - 1; i++)
+    for (size_t i = 0; i < windowSize.y / scale - 1; i++)
         output += 'U';
-    for (int i = 0; i < 2; i++)
+    for (size_t i = 0; i < 2; i++)
         output += 'R';
     return output;
 }
@@ -147,7 +148,7 @@ void UpdateSettings()
     if (lastScale != scale || lastApplesNumber != applesNumber || lastAutoMode != autoMode)
     {
         lastScale = scale;
-        horizontalCellsNumber = floor(windowSize[0] / scale);
+        horizontalCellsNumber = floor(windowSize.x / scale);
         lastApplesNumber = applesNumber;
         lastAutoMode = autoMode;
         Restart();
@@ -155,13 +156,16 @@ void UpdateSettings()
     if (lastVsync != vsync)
     {
         lastVsync = vsync;
-        if (!vsync) ClearWindowState(FLAG_VSYNC_HINT);
-        else SetWindowState(FLAG_VSYNC_HINT);
+        if (!vsync)
+            ClearWindowState(FLAG_VSYNC_HINT);
+        else
+            SetWindowState(FLAG_VSYNC_HINT);
     }
-    if (lastAppleColor.r != appleColor.r || lastAppleColor.g != appleColor.g || lastAppleColor.b != appleColor.b)
+    if (lastAppleColor.r != appleColor.r || lastAppleColor.g != appleColor.g ||
+        lastAppleColor.b != appleColor.b)
     {
         lastAppleColor = appleColor;
-        for (int i = 0; i < apples.size(); i++)
+        for (size_t i = 0; i < apples.size(); i++)
             apples[i].color = appleColor;
     }
     if (lastAudioVolume != audioVolume)
@@ -175,21 +179,36 @@ void DrawSprites()
 {
     // Print the background if it's fun mode
     if (mode == "fun")
-        DrawTextureEx(isGameOver ? funGameOverTexture : funTexture, Vector2{0, 0}, 0, (float)GetScreenHeight() / funTexture.height, WHITE);
+        DrawTextureEx(isGameOver ? funGameOverTexture : funTexture, Vector2{0, 0}, 0,
+                      (float)GetScreenHeight() / funTexture.height, WHITE);
 
     // Draw the snake
-    for (int i = 0; i < snake.body.size(); i++)
-        DrawRectangle((snake.body[i] % horizontalCellsNumber) * scale * (GetScreenWidth() * 1.f / windowSize[0]) + SNAKE_BORDER_SIZE, 
-            (snake.body[i] / horizontalCellsNumber) * scale * (GetScreenHeight() * 1.f / windowSize[1]) + SNAKE_BORDER_SIZE,
-            scale * (GetScreenWidth() * 1.f / windowSize[0]) - SNAKE_BORDER_SIZE, 
-            scale * (GetScreenHeight() * 1.f / windowSize[1]) - SNAKE_BORDER_SIZE, snake.color);
+    for (size_t i = 0; i < snake.body.size(); i++)
+    {
+        float x = snake.body[i] % horizontalCellsNumber * scale *
+                      (GetScreenWidth() * 1.f / windowSize.x) +
+                  SNAKE_BORDER_SIZE;
+        float y = snake.body[i] * 1.f / horizontalCellsNumber * scale *
+                      (GetScreenHeight() * 1.f / windowSize.y) +
+                  SNAKE_BORDER_SIZE;
+        DrawRectangle(x, y, scale * (GetScreenWidth() * 1.f / windowSize.x) - SNAKE_BORDER_SIZE,
+                      scale * (GetScreenHeight() * 1.f / windowSize.y) - SNAKE_BORDER_SIZE,
+                      snake.color);
+    }
 
     // Draw the apples
-    for (int i = 0; i < apples.size(); i++)
-        DrawRectangle((apples[i].position % horizontalCellsNumber) * scale * (GetScreenWidth() * 1.f / windowSize[0]) + SNAKE_BORDER_SIZE, 
-            (apples[i].position / horizontalCellsNumber) * scale * (GetScreenHeight() * 1.f / windowSize[1]) + SNAKE_BORDER_SIZE,
-            scale * (GetScreenWidth() * 1.f / windowSize[0]) - SNAKE_BORDER_SIZE, 
-            scale * (GetScreenHeight() * 1.f / windowSize[1]) - SNAKE_BORDER_SIZE, apples[i].color);
+    for (size_t i = 0; i < apples.size(); i++)
+    {
+        float x = apples[i].position % horizontalCellsNumber * scale *
+                      (GetScreenWidth() * 1.f / windowSize.x) +
+                  SNAKE_BORDER_SIZE;
+        float y = apples[i].position * 1.f / horizontalCellsNumber * scale *
+                      (GetScreenHeight() * 1.f / windowSize.y) +
+                  SNAKE_BORDER_SIZE;
+        DrawRectangle(x, y, scale * (GetScreenWidth() * 1.f / windowSize.x) - SNAKE_BORDER_SIZE,
+                      scale * (GetScreenHeight() * 1.f / windowSize.y) - SNAKE_BORDER_SIZE,
+                      apples[i].color);
+    }
 }
 
 void DrawFrame()
@@ -210,14 +229,17 @@ void DrawFrame()
         {
             PauseMusicStream(pauseMusic);
             ResumeMusicStream(bgMusic);
-        }            
+        }
     }
-    
+
     // Detect player input
     ProcessPlayerInput();
 
     // Snake physics stuff
-    if ((GetTime() - delayClock >= std::max(1 / (snake.speed * sqrt(snake.body.size())), 1.0 / snake.maxSpeed) || noSpeedLimit) && !isGameOver && !isPaused)
+    if ((GetTime() - delayClock >=
+             std::max(1 / (snake.speed * sqrt(snake.body.size())), 1.0 / snake.maxSpeed) ||
+         noSpeedLimit) &&
+        !isGameOver && !isPaused)
     {
         delayClock = GetTime();
 
@@ -225,7 +247,7 @@ void DrawFrame()
         if (snake.keyBuffer.size() == 0 && autoMode == true)
         {
             std::string buf = GenerateAutoModeKeypresses();
-            for (int i = 0; i < buf.size(); i++)
+            for (size_t i = 0; i < buf.size(); i++)
                 snake.keyBuffer.push_back(buf[i]);
         }
 
@@ -246,7 +268,7 @@ void DrawFrame()
         // Remove the last tail piece
         snake.body.erase(snake.body.begin());
         // Move the head
-        snake.body.push_back(snake.body[snake.body.size()-1] + snakeDirectionInteger);
+        snake.body.push_back(snake.body[snake.body.size() - 1] + snakeDirectionInteger);
 
         // Check apple collision
         snake.CheckAppleCollision();
@@ -256,22 +278,22 @@ void DrawFrame()
 
         // Check self-collision
         snake.CheckSelfCollision();
-    
+
         // fun mode check
-        if (snake.body.size() >= funModeLevel && mode != "fun" && funMode == true)
+        if (snake.body.size() >= (size_t)funModeLevel && mode != "fun" && funMode == true)
         {
             mode = "fun";
             PauseMusicStream(bgMusic);
             ResumeMusicStream(funMusic);
         }
-        if (!(snake.body.size() >= funModeLevel && funMode == true) && mode != "normal")
+        if (!(snake.body.size() >= (size_t)funModeLevel && funMode == true) && mode != "normal")
         {
             mode = "normal";
             PauseMusicStream(funMusic);
             ResumeMusicStream(bgMusic);
         }
     }
-    
+
     // Update data fom settings
     UpdateSettings();
 

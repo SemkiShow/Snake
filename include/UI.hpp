@@ -1,7 +1,6 @@
-#include "raylib.h"
-#include "raygui.h"
-#include <string>
-#include <cmath>
+#pragma once
+
+#include <raygui.h>
 
 extern bool isPaused;
 extern bool isSettings;

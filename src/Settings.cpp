@@ -1,5 +1,7 @@
-#include "Settings.hpp"
 #include "Game.hpp"
+#include "Settings.hpp"
+#include <fstream>
+#include <iostream>
 
 bool funMode = false;
 int funModeLevel = 5;
@@ -13,22 +15,29 @@ bool autoMode = false;
 bool vsync = true;
 float audioVolume = 0.5f;
 
-std::vector<std::string> Split(std::string input, char delimiter)
+std::vector<std::string> Split(const std::string& input, char delimiter = ' ')
 {
     std::vector<std::string> output;
     output.push_back("");
     int index = 0;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         if (input[i] == delimiter)
         {
-            index++;
             output.push_back("");
+            index++;
             continue;
         }
         output[index] += input[i];
     }
     return output;
+}
+
+std::string TrimJunk(const std::string& input)
+{
+    auto first = input.find_first_not_of("\t\n\r\f\v");
+    auto last = input.find_last_not_of("\t\n\r\f\v");
+    return (first == input.npos) ? "" : input.substr(first, last - first + 1);
 }
 
 void Save(std::string fileName)
@@ -41,8 +50,10 @@ void Save(std::string fileName)
     settingsFile << "speed=" << snake.speed << '\n';
     settingsFile << "max-speed=" << snake.maxSpeed << '\n';
     settingsFile << "scale=" << scale << '\n';
-    settingsFile << "snake-color=" << (int)snake.color.r << ',' << (int)snake.color.g  << ',' << (int)snake.color.b << '\n';
-    settingsFile << "apple-color=" << (int)appleColor.r << ',' << (int)appleColor.g << ',' << (int)appleColor.b << '\n';
+    settingsFile << "snake-color=" << (int)snake.color.r << ',' << (int)snake.color.g << ','
+                 << (int)snake.color.b << '\n';
+    settingsFile << "apple-color=" << (int)appleColor.r << ',' << (int)appleColor.g << ','
+                 << (int)appleColor.b << '\n';
     settingsFile << "apples-number=" << applesNumber << '\n';
     settingsFile << "no-speed-limit=" << (noSpeedLimit ? "true" : "false") << "\n";
     settingsFile << "auto-mode=" << (autoMode ? "true" : "false") << "\n";
@@ -53,10 +64,10 @@ void Save(std::string fileName)
     // Save score
     std::fstream scoreListFile;
     scoreListFile.open("score.txt", std::ios::out);
-    for (int k = 0; k < scores.size(); k++)
+    for (size_t k = 0; k < scores.size(); k++)
     {
         scoreListFile << scores[k];
-        if (k != scores.size()-1) scoreListFile << "\n";
+        if (k < scores.size() - 1) scoreListFile << "\n";
     }
     scoreListFile.close();
 }
@@ -69,8 +80,14 @@ void Load(std::string fileName)
     std::string buf, label, value;
     while (std::getline(settingsFile, buf))
     {
-        label = Split(buf, '=')[0];
-        value = Split(buf, '=')[1];
+        auto split = Split(buf, '=');
+        if (split.size() < 2)
+        {
+            std::cout << "Error: invalid settings.txt!\n";
+            continue;
+        }
+        label = TrimJunk(split[0]);
+        value = TrimJunk(split[1]);
 
         if (label == "fun-mode") funMode = value == "true";
         if (label == "fun-mode-level") funModeLevel = stoi(value);

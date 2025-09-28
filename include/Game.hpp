@@ -1,11 +1,10 @@
-#include "raylib.h"
+#pragma once
+
+#include <raylib.h>
 #include <string>
 #include <vector>
-#include <fstream>
-#include <random>
-#include <algorithm>
 
-extern unsigned int windowSize[2];
+extern Vector2 windowSize;
 extern unsigned int horizontalCellsNumber;
 
 extern char lastKeyPress;
@@ -22,30 +21,30 @@ extern bool isGameOver;
 extern bool isHighscore;
 extern std::string mode;
 
-extern std::vector<int> scores;
+extern std::vector<size_t> scores;
 
 class Apple
 {
-    public:
-        unsigned int position;
-        Color color = Color{255, 0, 0, 255};
+  public:
+    size_t position;
+    Color color = Color{255, 0, 0, 255};
 };
 extern std::vector<Apple> apples;
 
 class Snake
 {
-    public:
-    std::vector<int> body;
-        char direction = 'R';
-        Color color = Color{100, 250, 50, 255};
-        std::vector<char> keyBuffer;
-        float speed = 2;
-        float maxSpeed = 20;
-        std::vector<char> directionHistory;
-        int lastTailPosition = 0;
-        void CheckAppleCollision();
-        void CheckWallCollision();
-        void CheckSelfCollision();
+  public:
+    std::vector<size_t> body;
+    char direction = 'R';
+    Color color = Color{100, 250, 50, 255};
+    std::vector<char> keyBuffer;
+    float speed = 2;
+    float maxSpeed = 20;
+    std::vector<char> directionHistory;
+    int lastTailPosition = 0;
+    void CheckAppleCollision();
+    void CheckWallCollision();
+    void CheckSelfCollision();
 };
 extern Snake snake;
 

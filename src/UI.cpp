@@ -1,7 +1,7 @@
 #define RAYGUI_IMPLEMENTATION
-#include "UI.hpp"
-#include "Settings.hpp"
 #include "Game.hpp"
+#include "Settings.hpp"
+#include "UI.hpp"
 
 #define UI_SPACING 30
 #define ELEMENT_SIZE 30
@@ -14,40 +14,47 @@ bool isSettings = false;
 
 float nextElementPositionY = UI_SPACING * 2;
 
-void DrawCheckBox(char* text, bool* value)
+void DrawCheckBox(const char* text, bool* value)
 {
-    GuiCheckBox(Rectangle{UI_SPACING * 2, nextElementPositionY, ELEMENT_SIZE, ELEMENT_SIZE}, text, value);
+    GuiCheckBox(Rectangle{UI_SPACING * 2, nextElementPositionY, ELEMENT_SIZE, ELEMENT_SIZE}, text,
+                value);
     nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
 }
 
-void DrawSlider(char* leftText, char* rightText, float* value, float minValue, float maxValue)
+void DrawSlider(const char* leftText, const char* rightText, float* value, float minValue, float maxValue)
 {
-    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, value, minValue, maxValue);
-    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
+    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText,
+              rightText, value, minValue, maxValue);
+    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING * 2) / 2.f,
+             nextElementPositionY + 5, 24, WHITE);
     nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
 }
 
-void DrawSliderInt(char* leftText, char* rightText, int* value, float minValue, float maxValue)
+void DrawSliderInt(const char* leftText, const char* rightText, int* value, float minValue, float maxValue)
 {
     float valueFloat = *value;
-    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText, rightText, &valueFloat, minValue, maxValue);
+    GuiSlider(Rectangle{UI_SPACING * 2, nextElementPositionY, SLIDER_WIDTH, ELEMENT_SIZE}, leftText,
+              rightText, &valueFloat, minValue, maxValue);
     *value = valueFloat;
-    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING*2) / 2.f, nextElementPositionY + 5, 24, WHITE);
+    DrawText(std::to_string(*value).c_str(), (SLIDER_WIDTH + UI_SPACING * 2) / 2.f,
+             nextElementPositionY + 5, 24, WHITE);
     nextElementPositionY += ELEMENT_SIZE + ELEMENT_SPACING;
 }
 
-void DrawColorPicker(char* text, Color* color)
+void DrawColorPicker(const char* text, Color* color)
 {
-    GuiColorPanel(Rectangle{UI_SPACING * 2, nextElementPositionY, COLOR_PICKER_SIZE, COLOR_PICKER_SIZE}, text, color);
+    GuiColorPanel(
+        Rectangle{UI_SPACING * 2, nextElementPositionY, COLOR_PICKER_SIZE, COLOR_PICKER_SIZE}, text,
+        color);
     nextElementPositionY += COLOR_PICKER_SIZE + ELEMENT_SPACING;
 }
 
 void DrawSettings(bool* isOpen)
 {
     if (!*isOpen) return;
-    DrawRectangleRounded(
-        Rectangle{UI_SPACING, UI_SPACING, (float)GetScreenWidth() - UI_SPACING*2, (float)GetScreenHeight() - UI_SPACING*2}, 
-        0.1f, 1, Color{128, 128, 128, 128});
+    DrawRectangleRounded(Rectangle{UI_SPACING, UI_SPACING, (float)GetScreenWidth() - UI_SPACING * 2,
+                                   (float)GetScreenHeight() - UI_SPACING * 2},
+                         0.1f, 1, Color{128, 128, 128, 128});
     nextElementPositionY = UI_SPACING * 2;
     DrawCheckBox("fun-mode", &funMode);
     DrawSliderInt("", "fun-mode-level", &funModeLevel, 0, 100);
@@ -66,32 +73,42 @@ void DrawSettings(bool* isOpen)
 void DrawUI()
 {
 
-    if (isGameOver && mode == "fun") StopMusicStream(funMusic); 
-    if (isGameOver && mode == "normal" && snake.body.size() < horizontalCellsNumber * windowSize[1] / scale)
+    if (isGameOver && mode == "fun") StopMusicStream(funMusic);
+    if (isGameOver && mode == "normal" &&
+        snake.body.size() < horizontalCellsNumber * windowSize.y / scale)
     {
         StopMusicStream(bgMusic);
-        DrawText("Game Over!", .13f * GetScreenWidth(), .3f * GetScreenHeight(), 0.135f * GetScreenWidth(), RED);
+        DrawText("Game Over!", .13f * GetScreenWidth(), .3f * GetScreenHeight(),
+                 0.135f * GetScreenWidth(), RED);
     }
     // Print the highscore text is necessary
-    if (isHighscore && isGameOver && snake.body.size() < horizontalCellsNumber * windowSize[1] / scale)
+    if (isHighscore && isGameOver &&
+        snake.body.size() < horizontalCellsNumber * windowSize.y / scale)
     {
-        DrawText("Highscore!", .35f * GetScreenWidth(), .6f * GetScreenHeight(), 0.05f * GetScreenWidth(), YELLOW);
-        DrawText(("Last best score: " + std::to_string(scores[scores.size()-2])).c_str(), 
-            .345f * GetScreenWidth(), .7f * GetScreenHeight(), .03f * GetScreenWidth(), YELLOW);
+        DrawText("Highscore!", .35f * GetScreenWidth(), .6f * GetScreenHeight(),
+                 0.05f * GetScreenWidth(), YELLOW);
+        DrawText(("Last best score: " + std::to_string(scores[scores.size() - 2])).c_str(),
+                 .345f * GetScreenWidth(), .7f * GetScreenHeight(), .03f * GetScreenWidth(),
+                 YELLOW);
     }
 
     // Print score text
-    DrawText(((mode == "normal" ? "Score: " : "Social  credit: ") + std::to_string(snake.body.size())).c_str(), 
+    DrawText(
+        ((mode == "normal" ? "Score: " : "Social  credit: ") + std::to_string(snake.body.size()))
+            .c_str(),
         0, 0, .03f * GetScreenWidth(), WHITE);
 
     // Print You Won! text
-    if (snake.body.size() >= horizontalCellsNumber * windowSize[1] / scale)
-        DrawText("You won!", .25f * GetScreenWidth(), .3f * GetScreenHeight(), .135f * GetScreenWidth(), YELLOW);
+    if (snake.body.size() >= horizontalCellsNumber * windowSize.y / scale)
+        DrawText("You won!", .25f * GetScreenWidth(), .3f * GetScreenHeight(),
+                 .135f * GetScreenWidth(), YELLOW);
 
     // Draw buttons
-    if (GuiButton(Rectangle{(float)GetScreenWidth() - 30, 0, 30, 30}, "#142#")) isSettings = !isSettings;
-    if (GuiButton(Rectangle{(float)GetScreenWidth() - 60, 0, 30, 30}, isPaused ? "#131#" : "#132#")) isPaused = !isPaused;
+    if (GuiButton(Rectangle{(float)GetScreenWidth() - 30, 0, 30, 30}, "#142#"))
+        isSettings = !isSettings;
+    if (GuiButton(Rectangle{(float)GetScreenWidth() - 60, 0, 30, 30}, isPaused ? "#131#" : "#132#"))
+        isPaused = !isPaused;
     if (GuiButton(Rectangle{(float)GetScreenWidth() - 90, 0, 30, 30}, "#77#")) Restart();
-    
+
     DrawSettings(&isSettings);
 }

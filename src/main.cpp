@@ -1,11 +1,10 @@
-#include <random>
-#include <ctime>
+#include "Game.hpp"
 #include "Settings.hpp"
 #include "UI.hpp"
-#include "Game.hpp"
+#include <ctime>
 
 #if defined(PLATFORM_WEB)
-    #include <emscripten/emscripten.h>
+#include <emscripten/emscripten.h>
 #endif
 
 int main()
@@ -15,21 +14,21 @@ int main()
 
     int flags = 0;
     if (vsync) flags |= FLAG_VSYNC_HINT;
-    #if !defined(PLATFORM_WEB)
+#if !defined(PLATFORM_WEB)
     flags |= FLAG_WINDOW_HIGHDPI;
     flags |= FLAG_WINDOW_RESIZABLE;
-	#endif
+#endif
     SetConfigFlags(flags);
     GuiSetStyle(DEFAULT, TEXT_SIZE, 24);
 
-    InitWindow(windowSize[0], windowSize[1], "Snake");
+    InitWindow(windowSize.x, windowSize.y, "Snake");
     SetExitKey(-1);
     InitAudioDevice();
     SetAudioStreamBufferSizeDefault(8192);
     SetMasterVolume(audioVolume);
 
     GuiSetFont(GetFontDefault());
-    
+
     bgMusic = LoadMusicStream("resources/snake-bg.ogg");
     PlayMusicStream(bgMusic);
     funMusic = LoadMusicStream("resources/fun-bg.ogg");
