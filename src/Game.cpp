@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 SemkiShow
+//
+// SPDX-License-Identifier: MIT
+
 #include "Game.hpp"
 #include "Settings.hpp"
 #include "UI.hpp"

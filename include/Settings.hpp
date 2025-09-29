@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 SemkiShow
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <raylib.h>
