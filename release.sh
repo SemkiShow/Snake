@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-executable_name=Pseudo3DRenderer
+executable_name=Snake
 
 # Compiling for Linux
 cmake -B build_release -DCMAKE_BUILD_TYPE=Release

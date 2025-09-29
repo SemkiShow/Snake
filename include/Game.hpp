@@ -43,7 +43,7 @@ class Snake
     Color color = Color{100, 250, 50, 255};
     std::vector<char> keyBuffer;
     float speed = 2;
-    float maxSpeed = 20;
+    float maxSpeed = 10;
     std::vector<char> directionHistory;
     int lastTailPosition = 0;
     void CheckAppleCollision();

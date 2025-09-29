@@ -9,8 +9,6 @@
 
 bool funMode = false;
 int funModeLevel = 5;
-float speed = 2;
-float maxSpeed = 20;
 int scale = 32;
 Color appleColor = Color{255, 0, 0, 255};
 int applesNumber = 1;

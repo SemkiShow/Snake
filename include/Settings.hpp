@@ -9,8 +9,6 @@
 
 extern bool funMode;
 extern int funModeLevel;
-extern float speed;
-extern float maxSpeed;
 extern int scale;
 extern Color appleColor;
 extern int applesNumber;
